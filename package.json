@@ -1,0 +1,45 @@
+{
+  "name": "artracker-ts",
+  "version": "1.0.0",
+  "description": "Tracker javacsript sandbox",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack serve --inline --open --config webpack.dev.js",
+    "dev": "webpack serve --inline --open --config webpack.dev.js",
+    "dev:image": "webpack serve --env=MODE='image' --inline --open --config webpack.dev.js",
+    "dev:capture": "webpack serve --env=MODE='capture' --inline --open --config webpack.dev.js",
+    "build": "webpack --config webpack.prod.js",
+    "build:capture": "webpack --env=MODE='capture' --config webpack.prod.js"
+  },
+  "author": "Hololink",
+  "license": "ISC",
+  "dependencies": {
+    "@babylonjs/core": "^4.2.0",
+    "@babylonjs/inspector": "^4.2.0",
+    "process": "^0.11.10",
+    "recordrtc": "^5.6.2",
+    "rxjs": "^6.6.6",
+    "stats-js": "^1.0.1",
+    "ts-loader": "^9.2.6"
+  },
+  "devDependencies": {
+    "@types/recordrtc": "^5.6.8",
+    "clean-webpack-plugin": "^3.0.0",
+    "copy-webpack-plugin": "^8.0.0",
+    "css-loader": "^5.1.1",
+    "dotenv": "^8.2.0",
+    "html-loader": "^2.1.1",
+    "html-webpack-injector": "^1.1.4",
+    "html-webpack-plugin": "^5.3.0",
+    "loader-utils": "^2.0.0",
+    "progress-bar-webpack-plugin": "^2.1.0",
+    "style-loader": "^2.0.0",
+    "typescript": "^4.2.3",
+    "webpack": "^5.24.3",
+    "webpack-cli": "^4.5.0",
+    "webpack-dev-server": "^3.11.2",
+    "webpack-merge": "^5.7.3",
+    "worker-loader": "^3.0.8",
+    "write-file-webpack-plugin": "^4.5.1"
+  }
+}

@@ -1,0 +1,153 @@
+body {
+    margin: 0;
+    padding: 0;
+    height: var(--body-height);
+    width: 100vw;
+    height: 100vh;
+
+    overflow: hidden !important;
+
+    z-index: -1;
+    position: relative;
+
+    background-color: black;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: 'Poppins', 'sans-serif';
+}
+.flex-col {
+    display: flex;
+    flex-direction: column;
+}
+.flex-col.center {
+    align-items: center;
+}
+.hidden {
+    display: none;
+}
+.error-container {
+    background: black;
+    border-radius: 15px;
+    z-index: 15;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    width: 350px;
+    height: 350px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    box-shadow: 0px 0px 5px #ffffff4d;
+}
+.error-container p {
+    font-size: 17px;
+    color: white;
+    text-align: center;
+}
+.error-btn {
+    padding: 5px 20px;
+    background: white;
+    color: black;
+    border-radius: 100px;
+    font-size: 17px;
+}
+
+.fade-out {
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s 0.5s, opacity 0.5s linear;
+}
+
+.fade-in {
+    animation: fadeIn 2.5s;
+    -webkit-animation: fadeIn 2.5s;
+    -moz-animation: fadeIn 2.5s;
+    -o-animation: fadeIn 2.5s;
+    -ms-animation: fadeIn 2.5s;
+  }
+  @keyframes fadeIn {
+    0% {opacity:0;}
+    100% {opacity:1;}
+  }
+  
+  @-moz-keyframes fadeIn {
+    0% {opacity:0;}
+    100% {opacity:1;}
+  }
+  
+  @-webkit-keyframes fadeIn {
+    0% {opacity:0;}
+    100% {opacity:1;}
+  }
+  
+  @-o-keyframes fadeIn {
+    0% {opacity:0;}
+    100% {opacity:1;}
+  }
+  
+  @-ms-keyframes fadeIn {
+    0% {opacity:0;}
+    100% {opacity:1;}
+  }
+
+.full-screen {
+    opacity: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#start-container {
+    z-index: 15;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.start-btn {
+    letter-spacing: 0.1em;
+    display: flex;
+    width: 300px;
+    justify-content: space-evenly;
+    align-items: center;
+    font-size: 28px;
+    font-weight: 400;
+    color: white;
+}
+
+.terms {
+    position: fixed;
+    top: 90%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    font-size: 15px;
+    color: white;
+}
+
+.terms-link {
+    color: white;
+}
+
+.pulsate {
+    -webkit-animation: pulsate 1.8s ease-out;
+    -webkit-animation-iteration-count: infinite;
+    opacity: 0.5;
+}
+@-webkit-keyframes pulsate {
+    0% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.5;
+    }
+}

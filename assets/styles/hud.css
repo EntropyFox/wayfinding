@@ -1,0 +1,156 @@
+/*Base divs for content, AR and HUD*/
+
+body {
+    height: 100%;
+    width: 100%;
+    position: relative;
+    z-index: -1;
+}
+:root {
+    --video-left: calc((0px - var(--video-width) / 2) + 50vw);
+    --video-top: 0; /* calc((0px - var(--video-height) / 2) + 50vh); */
+    --half-height: calc(var(--vh) * 50);
+}
+/*Base divs end*/
+
+/* MARKER SCANNER CSS BELOW */
+
+@keyframes smaller-box {
+    0% {
+        transform: scale(1);
+        box-shadow: inset 0 0 50px #de0b2e, inset 20px 0 80px #de0b2e;
+    }
+    100% {
+        transform: scale(0.5);
+        box-shadow: inset 0 0 5px #de0b2e, inset 2px 0 8px #de0b2e;
+    }
+}
+
+#scanner-frame-settings {
+    width: 100%;
+    height: 100%;
+    border-radius: 1%;
+    position: absolute;
+    animation: smaller-box 3s ease-in-out infinite;
+    z-index: 10;
+}
+
+#marker-box {
+    position: absolute;
+    width: calc(var(--video-width) / 2);
+    height: calc(var(--video-height) / 2);
+    left: 50%;
+    top: 50%;
+    z-index: 10;
+    transform: translate(-50%, -50%);
+}
+
+#marker-image {
+    pointer-events: none;
+    position: absolute;
+    width: calc(var(--video-width) / 1.5);
+    height: auto;
+    object-fit: contain;
+    left: 50%;
+    top: 50%;
+    opacity: 0.3;
+    z-index: 10;
+    transform: translate(-50%, -50%);
+}
+
+.point-message {
+    color: white;
+    width: 90%;
+    text-align: center;
+    position: absolute;
+    top: -2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0.5;
+}
+
+#scanner {
+    position: absolute;
+    background: transparent;
+    background-size: cover;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 800;
+}
+
+#hud {
+    position: absolute;
+    z-index: 1000;
+    height: calc(100 * var(--vh, 1vh));
+    width: 100vw;
+    /* safari bug */
+    max-height: -webkit-fill-available;
+
+    padding: 1rem;
+
+    display: grid;
+    grid-template: 'hud' 1fr / 1fr;
+    pointer-events: none;
+}
+
+#hud > * {
+    font-size: 24px;
+    grid-area: hud;
+    position: absolute;
+}
+
+#hud > * {
+    pointer-events: all;
+}
+
+#hud > button {
+    height: 4rem;
+    margin: 0rem;
+    padding: 0.5rem;
+    width: var(--width);
+    background-color: var(--bg-color);
+    color: var(--fg-color);
+    border: none;
+}
+
+#hud > img {
+    width: var(--width);
+    margin: 0rem;
+    padding: 0.5rem;
+    border: none;
+}
+
+#hud > p {
+    text-align: center;
+    margin: 0rem;
+    padding: 1rem;
+    width: var(--width);
+    background-color: var(--bg-color);
+    color: var(--fg-color);
+}
+
+.hidden {
+    display: none !important;
+}
+
+#renderCanvas {
+    position: absolute;
+    left: var(--video-left);
+    top: var(--video-top);
+}
+
+#inputVideo {
+    position: absolute;
+    left: var(--video-left);
+    top: var(--video-top);
+}
+
+#videoCanvas {
+    position: absolute;
+    left: var(--video-left);
+    top: var(--video-top);
+}
+
+/* MARKER SCANNER ENDS */

@@ -1,0 +1,98 @@
+body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden !important;
+
+  z-index: -1;
+  position: relative;
+
+  background-color: black;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: "Poppins", "sans-serif";
+}
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+.flex-col.center {
+  align-items: center;
+}
+
+#renderCanvas {
+  position: absolute;
+  left: var(--video-left);
+  top: var(--video-top);
+}
+
+#inputVideo {
+  position: absolute;
+  left: var(--video-left);
+  top: var(--video-top);
+}
+
+#videoCanvas {
+  position: absolute;
+  left: var(--video-left);
+  top: var(--video-top);
+}
+
+#debug {
+  background-color: rgba(255, 255, 255, 0.5);
+  text-align: right;
+  font-size: larger;
+  font-weight: bold;
+  color: blue;
+  position: absolute;
+  top: 0;
+  /* padding: 1em; */
+  width: var(--video-width);
+}
+
+.debug-output {
+  padding-right: 1em;
+}
+
+#capture-content {
+  position: relative;
+}
+
+#capture-content video {
+  pointer-events: none !important;
+}
+
+#btn-group button {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  background-color: #555;
+  color: white;
+  font-size: 12px;
+  padding: 10px 14px;
+  border: none;
+  cursor: pointer;
+  border-radius: 16px;
+}
+
+#start-btn {
+  left: 10% !important;
+}
+#stop-btn {
+  left: 25% !important;
+}
+#download-sensor-btn {
+  left: 45% !important;
+}
+#download-video-btn {
+  left: 75% !important;
+}
+
+.hidden {
+  display: none !important;
+}

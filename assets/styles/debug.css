@@ -1,0 +1,15 @@
+#debug {
+    background-color: rgba(255,255,255,0.5);
+    text-align: right;
+    font-size: larger;
+    font-weight: bold;
+    color: blue;
+    position: absolute;
+    top: 0;
+    /* padding: 1em; */
+    width: var(--video-width);
+}
+
+.debug-output {
+    padding-right: 1em;
+}

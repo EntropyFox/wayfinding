@@ -1,0 +1,38 @@
+/* Base divs for content, AR and HUD*/
+
+body {
+    height: 100%;
+    width: 100%;
+    position: relative;
+    z-index: -1;
+}
+:root {
+    --video-left: calc((0px - var(--video-width) / 2) + 50vw);
+    --video-top: 0; /* calc((0px - var(--video-height) / 2) + 50vh); */
+    --half-height: calc(var(--vh) * 50);
+}
+/*Base divs end*/
+
+.hidden {
+    display: none !important;
+}
+
+#renderCanvas {
+    position: absolute;
+    left: var(--video-left);
+    top: var(--video-top);
+}
+
+#inputVideo {
+    position: absolute;
+    left: var(--video-left);
+    top: var(--video-top);
+}
+
+#videoCanvas {
+    position: absolute;
+    left: var(--video-left);
+    top: var(--video-top);
+}
+
+/* MARKER SCANNER ENDS */
