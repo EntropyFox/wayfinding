@@ -1,4 +1,4 @@
-import { AssetsManager, Color4, Engine, TransformNode, Vector3 } from "@babylonjs/core";
+import { AssetsManager, Color4, Engine, Quaternion, TransformNode, Vector3 } from "@babylonjs/core";
 import { initializeScene } from "../webgl/scene.setup";
 
 export const WayfindingRendere = async (canvas: HTMLCanvasElement) => {
@@ -19,12 +19,17 @@ export const WayfindingRendere = async (canvas: HTMLCanvasElement) => {
     const assetsManager = new AssetsManager(scene);
 	const meshTask = assetsManager.addMeshTask("Arrow task", "", "https://storage.googleapis.com/hololink/dev/arrow/", "scene.gltf");
     meshTask.onSuccess = (task) => {
-        console.log('task: ', task);
-        // task.loadedMeshes[0].position = new Vector3(0, 0, 1);
+        task.loadedMeshes[0].rotationQuaternion = Quaternion.FromEulerAngles(0, 0, Math.PI / 2);
+        // console.log('task.loadedMeshes[0].rotationQuaternion: ', task.loadedMeshes[0].rotationQuaternion);
+        // task.loadedMeshes[0].
         task.loadedMeshes[0].parent = content;
     }
 
     assetsManager.load();
+
+    // scene.debugLayer.show({
+    //     embedMode: true
+    // });
 
 
     engine.runRenderLoop(() => {
