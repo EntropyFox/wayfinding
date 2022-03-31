@@ -12,6 +12,7 @@ export const WayfindingRendere = async (canvas: HTMLCanvasElement) => {
     });
 
     let content = new TransformNode('content', scene);
+    content.position = new Vector3(0, 0, 1);
     // content.setEnabled(false);
 
     /// Load arrow
@@ -19,7 +20,7 @@ export const WayfindingRendere = async (canvas: HTMLCanvasElement) => {
 	const meshTask = assetsManager.addMeshTask("Arrow task", "", "https://storage.googleapis.com/hololink/dev/arrow/", "scene.gltf");
     meshTask.onSuccess = (task) => {
         console.log('task: ', task);
-        task.loadedMeshes[0].position = new Vector3(0, 0, 1);
+        // task.loadedMeshes[0].position = new Vector3(0, 0, 1);
         task.loadedMeshes[0].parent = content;
     }
 
