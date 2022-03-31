@@ -21,7 +21,7 @@ const plenarWorker = () => {
     const planarFunctions: PlanarFunctions = {
         load: () => {
             return new Promise<void>((resolve, reject) => {
-                importScripts('/assets/planar.js');
+                importScripts('/planar.js');
                 Module.onRuntimeInitialized = () => {
                     resolve();
                 };

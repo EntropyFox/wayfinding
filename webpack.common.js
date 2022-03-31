@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 
 const HTMLWebpackPluginConfig = new HtmlWebpackPlugin({
-    template: __dirname + '/index.html',
+    template: __dirname + '/src/index.html',
     filename: 'index.html',
     chunks: ['index']
 });
@@ -13,7 +13,7 @@ const HTMLWebpackPluginConfig = new HtmlWebpackPlugin({
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const CopyWebpackPluginConfig = new CopyWebpackPlugin({
     patterns: [
-        { from: 'assets', to: '' }
+        { from: __dirname + '/src/assets', to: '' }
     ],
 });
 

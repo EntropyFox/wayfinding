@@ -1,16 +1,18 @@
 import { TrackingManager } from "./tracker/tracking.manager";
-import "./styles/style.css";
-import { DebugPanel } from "./debug-panel";
+// import "./styles/style.css";
 import { ARSceneRendere } from "./webgl/ar-scene.rendere";
+import { DebugPanel } from "./debug-panel";
+import { WayFinding } from "./wayfinding/wayfinding";
 
 document.addEventListener("DOMContentLoaded", theDomHasLoaded, false);
 
 DebugPanel.setColor("#FF00FF");
 
-const mode = process.env.mode || "tracking";
+const system = process.env.SYSTEM || "tracking";
+console.log('SYSTEM: ', system);
 
 async function theDomHasLoaded(e) {
-	if (mode === "tracking") {
+	if (system === "tracking") {
 		const trackingManager = TrackingManager();
 		const captureContent = document.getElementById("capture-content");
 		captureContent.style.display = "none";
@@ -40,5 +42,11 @@ async function theDomHasLoaded(e) {
 				// stats.end();
 			});
 		});
+	}
+	if (system === 'wayfinding') {
+		const trackerContent = document.getElementById("tracker-content");
+		trackerContent.style.display = "none";
+		const sensorContent = document.getElementById('sensor-content');
+		WayFinding().then();
 	}
 }

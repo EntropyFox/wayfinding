@@ -2,13 +2,12 @@ import { BehaviorSubject } from 'rxjs';
 import { CanvasElement } from '../element-factories/canvas.factory';
 import { getImageDataFromUrl } from '../function-helpers/image.functions';
 
-import { DebugPanel } from '../debug-panel';
-import { FPSSampler } from './fps.samlper';
 import { FPSCounter } from './fps.counter';
 import { VideoHandler } from './video.handler';
 import { TrackingResult } from './tracking.model';
 import { WorkerHandler } from '../workers/work.handler';
 import Stats from 'stats-js';
+import { DebugPanel } from '../debug-panel';
 
 export const TrackingManager = async () => {
 
@@ -20,8 +19,6 @@ export const TrackingManager = async () => {
     // await planarHandler.load();
     // planarHandler.init();
     const workerHandler = await WorkerHandler();
-    
-    
     const videoHandler = await VideoHandler();
 
     const videoCanvas = document.getElementById('videoCanvas') as HTMLCanvasElement;
@@ -53,8 +50,6 @@ export const TrackingManager = async () => {
 
         const loopFps = FPSCounter();
         const trackingFps = FPSCounter();
-        // const fpsSampler = FPSSampler();
-        
                
         const trackingLoop = (totalMs) => {
             

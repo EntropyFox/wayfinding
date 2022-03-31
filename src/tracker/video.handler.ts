@@ -10,6 +10,7 @@ export const VideoHandler = async () => {
     console.log('videoConstraint: ', videoConstraint);
 
     const video = await VideoElement(videoConstraint);
+    console.log('video: ', video);
 
     /// Video canvas where we draw the video stream
     const videoCanvas = document.getElementById('videoCanvas') as HTMLCanvasElement;
@@ -78,7 +79,7 @@ export const VideoHandler = async () => {
         img = await imageMode(magicMaze);
     }
 
-    const element = (mode === 'video') ? video.element() : img; 
+    const element = (mode === 'video') ? video.element() : img;
 
     return {
         startVideo,

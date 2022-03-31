@@ -20,7 +20,7 @@ module.exports = env => {
             rules: [],
         },
         entry: {
-            index: './index.ts',
+            index: './src/index.ts',
         },
         output: {
             filename: '[name].[contentHash].js',
@@ -29,7 +29,8 @@ module.exports = env => {
         },
         plugins: [
             new webpack.DefinePlugin({
-                'process.env.MODE': JSON.stringify(env.MODE)
+                'process.env.MODE': JSON.stringify(env.MODE),
+                'process.env.SYSTEM': JSON.stringify(env.SYSTEM)
             })
 
         ],

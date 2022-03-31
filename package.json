@@ -7,15 +7,15 @@
     "start": "webpack serve --inline --open --config webpack.dev.js",
     "dev": "webpack serve --inline --open --config webpack.dev.js",
     "dev:image": "webpack serve --env=MODE='image' --inline --open --config webpack.dev.js",
-    "dev:capture": "webpack serve --env=MODE='capture' --inline --open --config webpack.dev.js",
-    "build": "webpack --config webpack.prod.js",
-    "build:capture": "webpack --env=MODE='capture' --config webpack.prod.js"
+    "dev:wayfinding": "webpack serve --env=SYSTEM='wayfinding' --inline --open --config webpack.dev.js",
+    "build": "webpack --config webpack.prod.js"
   },
   "author": "Hololink",
   "license": "ISC",
   "dependencies": {
     "@babylonjs/core": "^4.2.0",
     "@babylonjs/inspector": "^4.2.0",
+    "@types/w3c-generic-sensor": "^1.0.5",
     "process": "^0.11.10",
     "recordrtc": "^5.6.2",
     "rxjs": "^6.6.6",

@@ -11,7 +11,7 @@ const filterWorker = () => {
     const filterFunctions: FilterFunctions = {
         load: () => {
             return new Promise<void>((resolve, reject) => {
-                importScripts('/assets/filter.js');
+                importScripts('/filter.js');
                 Module.onRuntimeInitialized = () => {
                     resolve();
                 };

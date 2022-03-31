@@ -5,26 +5,39 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
     <title>Hololink Tracker</title>
+
+    <style>
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #renderCanvasWayfinding {
+            width: 100%;
+            height: 100%;
+            display: block;
+            font-size: 0;
+        }
+    </style>
 </head>
 
 <body>
 
-    <div id="capture-content">
-        <div id="btn-group">
-            <button id="start-btn">Start</button>
-            <button id="stop-btn">Stop</button>
-            <button id="download-sensor-btn">load json</button>
-            <button id="download-video-btn">load webm</button>
-        </div>
-        <video id="video-capture" type="video/webm" playsinline muted autoplay></video>
+    <div id="sensor-content">
+        <h1>VERDEN</h1>
+        <canvas id="renderCanvasWayfinding"></canvas>
     </div>
 
-    
+
     <div id="tracker-content">
         <video id="inputVideo" playsinline></video>
         <canvas id="videoCanvas"></canvas>
         <canvas id="renderCanvas"></canvas>
-    
+
         <div id="debug">
             <p class="debug-output">
                 <span id="out-1"></span></br>
@@ -36,7 +49,7 @@
     </div>
 
 
-    
+
 </body>
 
 </html>
