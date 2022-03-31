@@ -20,9 +20,5 @@ export const initializeScene =
             scene
         );
 
-        scene.debugLayer.show({
-            embedMode: true
-        });
-
         return scene;
     };

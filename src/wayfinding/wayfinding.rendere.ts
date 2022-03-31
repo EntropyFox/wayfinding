@@ -1,4 +1,4 @@
-import { AssetsManager, Color4, Engine, MeshBuilder, ParticleSystem, Space, Texture, TransformNode, Vector3 } from "@babylonjs/core";
+import { AssetsManager, Color4, Engine, MeshBuilder, Quaternion,ParticleSystem, Space, Texture, TransformNode, Vector3 } from "@babylonjs/core";
 import { initializeScene } from "../webgl/scene.setup";
 
 export const WayfindingRendere = async (canvas: HTMLCanvasElement) => {
@@ -23,6 +23,7 @@ export const WayfindingRendere = async (canvas: HTMLCanvasElement) => {
         // task.loadedMeshes[0].position = new Vector3(0, 0, 1);
         const arrow = task.loadedMeshes[0];
         arrow.parent = content;
+        arrow.rotationQuaternion = Quaternion.FromEulerAngles(0, 0, Math.PI / 2);
 
         // Load Particle system
         // We don't have to load the particles in this callback
@@ -85,7 +86,8 @@ export const WayfindingRendere = async (canvas: HTMLCanvasElement) => {
             // Start the particle system
             particleSystem.start();
 
-            emitterBox.rotate(new Vector3(0, 1, 0), 0 * Math.PI / 180 );
+            //emitterBox.rotate(new Vector3(0, 1, 0), 0 * Math.PI / 180 );
+            emitterBox.rotationQuaternion = Quaternion.FromEulerAngles(0, 0, Math.PI / 2);
         }
 
         
