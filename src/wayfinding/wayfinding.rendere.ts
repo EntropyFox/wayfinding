@@ -1,4 +1,4 @@
-import { AssetsManager, Color4, Engine, MeshBuilder, Quaternion,ParticleSystem, Space, Texture, TransformNode, Vector3 } from "@babylonjs/core";
+import { AssetsManager, Color4, Engine, MeshBuilder, Quaternion,ParticleSystem, Space, Texture, TransformNode, Vector3, DeviceOrientationCamera } from "@babylonjs/core";
 import { initializeScene } from "../webgl/scene.setup";
 
 export const WayfindingRendere = async (canvas: HTMLCanvasElement) => {
@@ -7,9 +7,22 @@ export const WayfindingRendere = async (canvas: HTMLCanvasElement) => {
     const scene = initializeScene(engine)(canvas);
     // scene.clearColor = new Color4(0, 0, 0, 0);
 
-    scene.createDefaultEnvironment({
-        createSkybox: false,
-    });
+
+	/********** DEVICE ORIENTATION CAMERA EXAMPLE **************************/
+
+    // This creates and positions a device orientation camera 	
+    var camera = new DeviceOrientationCamera("DevOr_camera", new Vector3(0, 0, 0), scene);
+
+    // This targets the camera to scene origin
+    camera.setTarget(new Vector3(0, 0, 10));
+
+
+    // This attaches the camera to the canvas
+    camera.attachControl(canvas, true);
+	/**************************************************************/
+
+    // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
+    //var light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
 
     let content = new TransformNode('content', scene);
     content.position = new Vector3(0, 0, 1);
