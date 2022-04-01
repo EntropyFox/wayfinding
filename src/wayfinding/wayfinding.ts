@@ -1,5 +1,5 @@
 import { Angle, Quaternion } from '@babylonjs/core';
-import { map, mergeMap, tap } from 'rxjs/operators';
+import { first, map, mergeMap, tap } from 'rxjs/operators';
 import { Compass } from './compass';
 import { GeoLocation, GeoPoint } from './geolocation';
 import { Sensors } from './sensors';
@@ -21,23 +21,29 @@ export const WayFinding = async () => {
     const canvas = document.getElementById(
         'renderCanvasWayfinding'
     ) as HTMLCanvasElement;
-    const renderer = await WayfindingRendere(canvas);
     //const sensors = Sensors();
     const compass = await Compass();
     const geoLocation = GeoLocation(skjoldungerne);
-
+    const renderer = await WayfindingRendere(canvas);
     const updateModel = (angleToPoint: number) => (heading: number) => {
         const angle = Angle.FromDegrees(heading);
         const modelQuaternion = Quaternion.FromEulerAngles(
             0,
+            angle.radians() - angleToPoint,
+            0
+        );
+        const particleQuaternion = Quaternion.FromEulerAngles(
             0,
-            angle.radians() - angleToPoint
+            angle.radians() - angleToPoint,
+            0
         );
         renderer.content.rotationQuaternion = modelQuaternion;
+        renderer.particles.rotationQuaternion = particleQuaternion;
     };
 
     geoLocation.geolocation$
         .pipe(
+            first(),
             map((geoloc) => {
                 return {
                     distance: geoloc.distance,
@@ -45,7 +51,10 @@ export const WayFinding = async () => {
                 };
             }),
             mergeMap((geoloc) => {
-                return compass.heading$.pipe(tap(updateModel(geoloc.angle)));
+                return compass.heading$.pipe(
+                    first(),
+                    tap(updateModel(geoloc.angle))
+                );
             })
         )
         .subscribe();
