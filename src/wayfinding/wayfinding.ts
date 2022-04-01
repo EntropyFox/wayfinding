@@ -1,7 +1,7 @@
 import "../styles/wayfinding.css"; 
 import { Angle, Quaternion } from "@babylonjs/core";
 import { map, mergeMap, tap } from "rxjs/operators";
-import { GetConstraint, VideoElement } from "../element-factories/video.factory";
+import { GetConstraint } from "../element-factories/video.factory";
 import { isMobile } from "../webcam.manager";
 import { Compass } from "./compass";
 import { GeoLocation, GeoPoint } from "./geolocation";
@@ -23,11 +23,11 @@ export const WayFinding = async () => {
     const canvas = document.getElementById(
         'renderCanvasWayfinding'
     ) as HTMLCanvasElement;
-    const renderer = await WayfindingRendere(canvas);
     //const sensors = Sensors();
     const compass = await Compass();
     const geoLocation = GeoLocation(skjoldungerne);
-
+    const renderer = await WayfindingRendere(canvas);
+    
     /// Video
     const videoConstraint: MediaTrackConstraints = isMobile() ? {
         width: (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight),
