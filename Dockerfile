@@ -1,25 +1,16 @@
 FROM node:12 as builder
 WORKDIR /app
 
-COPY ./services/library/package*.json /app/library/
-COPY ./services/tracker/src/artracker-ts/package*.json /app/viewer/
+COPY ./package*.json /app/
 
-RUN npm install --prefix /app/library
-RUN npm install --prefix /app/viewer
+RUN npm install /app
 
 # Bundle app source
-COPY ./services/tracker/src/artracker-ts /app/viewer
-# Bundle library
-COPY ./services/library /app/library
+COPY ./ /app
 
-COPY ./config/tsconfig.json /config/tsconfig.json
-
-ARG BUILD 
-
-RUN npm run build --prefix /app/library
-RUN npm run ${BUILD} --prefix /app/viewer
+RUN npm run build
 
 FROM nginx:1.17-alpine as runner
-COPY ./services/tracker/src/artracker-ts/nginx/tracker.conf /etc/nginx/conf.d/
+COPY ./nginx/wayfinding.conf /etc/nginx/conf.d/
 RUN rm /etc/nginx/conf.d/default.conf
-COPY --from=0 /app/viewer/dist /usr/share/nginx/html
+COPY --from=0 /app/dist /usr/share/nginx/html

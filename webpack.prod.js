@@ -10,7 +10,7 @@ module.exports = env => {
         mode: 'production',
         devtool: 'source-map',
         entry: {
-            index: './index.ts',
+            index: './src/index.ts',
         },
         optimization: {
             minimizer: [
