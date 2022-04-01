@@ -14,7 +14,6 @@ console.log('SYSTEM: ', system);
 
 async function theDomHasLoaded(e) {
     document.querySelector('#interact').addEventListener('click', () => {
-        console.log('hello;');
         if (system === 'tracking') {
             const trackingManager = TrackingManager();
             const captureContent = document.getElementById('capture-content');
