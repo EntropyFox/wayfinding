@@ -1,9 +1,11 @@
-import { Angle, Quaternion } from '@babylonjs/core';
-import { map, mergeMap, tap } from 'rxjs/operators';
-import { Compass } from './compass';
-import { GeoLocation, GeoPoint } from './geolocation';
-import { Sensors } from './sensors';
-import { WayfindingRendere } from './wayfinding.renderer';
+import "../styles/wayfinding.css"; 
+import { Angle, Quaternion } from "@babylonjs/core";
+import { map, mergeMap, tap } from "rxjs/operators";
+import { GetConstraint, VideoElement } from "../element-factories/video.factory";
+import { isMobile } from "../webcam.manager";
+import { Compass } from "./compass";
+import { GeoLocation, GeoPoint } from "./geolocation";
+import { WayfindingRendere } from "./wayfinding.renderer";
 
 export const WayFinding = async () => {
     console.log('Way finding');
@@ -26,13 +28,27 @@ export const WayFinding = async () => {
     const compass = await Compass();
     const geoLocation = GeoLocation(skjoldungerne);
 
+    /// Video
+    const videoConstraint: MediaTrackConstraints = isMobile() ? {
+        width: (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight),
+        height: (window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth),
+        facingMode: 'environment',
+    } : GetConstraint('vga');
+    const video = document.getElementById('webcam') as HTMLVideoElement;
+    const stream = await navigator.mediaDevices.getUserMedia({
+        video: videoConstraint,
+        audio: false,
+    });
+    video.srcObject = stream;
+    await video.play().then();
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    
+
     const updateModel = (angleToPoint: number) => (heading: number) => {
         const angle = Angle.FromDegrees(heading);
-        const modelQuaternion = Quaternion.FromEulerAngles(
-            0,
-            0,
-            angle.radians() - angleToPoint
-        );
+        const modelQuaternion = Quaternion.FromEulerAngles(0, 0, angle.radians() - angleToPoint);
         renderer.content.rotationQuaternion = modelQuaternion;
     };
 

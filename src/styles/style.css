@@ -23,12 +23,6 @@ body {
   align-items: center;
 }
 
-#renderCanvasWayfinding {
-  position: absolute;
-  left: 640px;
-  top: 480px;
-}
-
 #renderCanvas {
   position: absolute;
   left: var(--video-left);

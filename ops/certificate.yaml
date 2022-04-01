@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wayfinding-cert
+spec:
+  commonName: wayfinding.dev.hololink.io
+  secretName: wayfinding-cert
+  dnsNames:
+    - wayfinding.dev.hololink.io
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer

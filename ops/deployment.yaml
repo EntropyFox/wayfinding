@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wayfinding
+spec:
+  replicas: 1
+  selector:
+      matchLabels:
+        app: wayfinding
+  template:
+      metadata:
+        labels:
+          app: wayfinding
+      spec:
+        containers:
+        - name: wayfinding
+          image: registry.gitlab.com/holofox/hololink/wayfinding:latest
+          imagePullPolicy: Always
+          # resources:
+          #   limits:
+          #     memory: 512Mi
+          #     cpu: "0.5"
+          #   requests:
+          #     memory: 256Mi
+          #     cpu: "0.25"
+          ports:
+          - containerPort: 80
+            protocol: TCP
+        imagePullSecrets:
+        - name: regcred
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: wayfinding-service
+spec:
+  selector:
+    app: wayfinding
+  ports:
+  - port: 80
+    targetPort: 80
+
+---
+
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wayfinding-cert
+spec:
+  commonName: wayfinding.dev.hololink.io
+  secretName: wayfinding-cert
+  dnsNames:
+    - wayfinding.dev.hololink.io
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+
+---
+
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: wayfinding-ingress-route
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`wayfinding.dev.hololink.io`)
+      kind: Rule
+      services:
+        - name: wayfinding-service
+          port: 80
+  tls:
+    secretName: wayfinding-cert

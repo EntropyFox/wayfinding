@@ -17,7 +17,7 @@ export const WayfindingRendere = async (canvas: HTMLCanvasElement) => {
     // Initialize engine and scene
     const engine = new Engine(canvas, true);
     const scene = initializeScene(engine)(canvas);
-    // scene.clearColor = new Color4(0, 0, 0, 0);
+    scene.clearColor = new Color4(0, 0, 0, 0);
 
     /********** DEVICE ORIENTATION CAMERA EXAMPLE **************************/
 

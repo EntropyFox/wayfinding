@@ -1,0 +1,22 @@
+body {
+    margin: 0;
+    padding: 0;
+    height: var(--body-height);
+    width: 100vw;
+    height: 100vh;
+
+    overflow: hidden !important;
+
+    z-index: -1;
+    position: relative;
+}
+
+#webcam {
+    position: absolute;
+}
+
+#renderCanvasWayfinding {
+    position: absolute;
+    left: var(--video-left);
+    top: var(--video-top);
+}
