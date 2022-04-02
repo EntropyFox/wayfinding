@@ -5,7 +5,6 @@ import {
     MeshBuilder,
     Quaternion,
     ParticleSystem,
-    Space,
     Texture,
     TransformNode,
     Vector3,
@@ -37,11 +36,21 @@ export const WayfindingRendere = async (
     );
 
     // This targets the camera to scene origin
-    camera.setTarget(new Vector3(0, 0, 10));
 
     // This attaches the camera to the canvas
     camera.attachControl(canvas, true);
     scene.setActiveCameraByName('DevOr_camera');
+
+    const northVector = new Vector3(0, 0, 10);
+    const quat = Quaternion.FromEulerAngles(
+        0,
+        Angle.FromDegrees(heading).radians(),
+        0
+    );
+    let headingVector = Vector3.Zero();
+    northVector.rotateByQuaternionToRef(quat, headingVector);
+    camera.setTarget(northVector);
+    console.log('northVector: ', headingVector);
 
     // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
     //var light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
@@ -177,3 +186,5 @@ export const WayfindingRendere = async (
         particles,
     };
 };
+
+export type WayfindingRendere = ReturnType<typeof WayfindingRendere>;

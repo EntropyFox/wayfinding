@@ -2,7 +2,6 @@ import { Angle, Quaternion } from '@babylonjs/core';
 import { first, map, mergeMap, tap } from 'rxjs/operators';
 import { Compass } from './compass';
 import { GeoLocation, GeoPoint } from './geolocation';
-import { Sensors } from './sensors';
 import { WayfindingRendere } from './wayfinding.renderer';
 
 export const WayFinding = async () => {
@@ -24,7 +23,13 @@ export const WayFinding = async () => {
     //const sensors = Sensors();
     const compass = await Compass();
     const geoLocation = GeoLocation(skjoldungerne);
-    const renderer = await WayfindingRendere(canvas);
+    // let renderer: UnboxPromise<WayfindingRendere>;
+
+    // Hardcoded heading can give troubles on desktop
+    const heading = 30; //await compass.heading$.toPromise();
+    console.log('heading: ', heading);
+    const renderer = await WayfindingRendere(canvas, heading);
+
     const updateModel = (angleToPoint: number) => (heading: number) => {
         const angle = Angle.FromDegrees(heading);
         const modelQuaternion = Quaternion.FromEulerAngles(
@@ -43,7 +48,6 @@ export const WayFinding = async () => {
 
     geoLocation.geolocation$
         .pipe(
-            first(),
             map((geoloc) => {
                 return {
                     distance: geoloc.distance,
