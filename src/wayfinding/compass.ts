@@ -1,7 +1,6 @@
 import { BehaviorSubject, filter } from 'rxjs';
 
 export const Compass = () => {
-
     const isIOS =
         navigator.userAgent.match(/(iPod|iPhone|iPad)/) &&
         navigator.userAgent.match(/AppleWebKit/);
