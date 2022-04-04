@@ -1,11 +1,12 @@
 import { BehaviorSubject, filter } from 'rxjs';
 
-export const Compass = () => {
+export const Compass = async () => {
     const isIOS =
         navigator.userAgent.match(/(iPod|iPhone|iPad)/) &&
         navigator.userAgent.match(/AppleWebKit/);
 
-    const isMobile = navigator.userAgent.match(/Android|webOS|iPhone|iPad|iPod/i) !== null;
+    const isMobile =
+        navigator.userAgent.match(/Android|webOS|iPhone|iPad|iPod/i) !== null;
 
     const heading$ = new BehaviorSubject<number>(null);
 
@@ -19,20 +20,22 @@ export const Compass = () => {
     };
 
     if (isIOS) {
-        (DeviceOrientationEvent as any)
-            .requestPermission()
-            .then((response) => {
-                if (response === 'granted') {
-                    window.addEventListener('deviceorientation', handler, true);
-                } else {
-                }
-            })
-            .catch(() => alert('not supported'));
+        try {
+            const response = await (
+                DeviceOrientationEvent as any
+            ).requestPermission();
+            if (response === 'granted') {
+                window.addEventListener('deviceorientation', handler, true);
+            } else {
+            }
+        } catch (error) {
+            console.log('Not suppoerted');
+        }
     } else {
         window.addEventListener('deviceorientationabsolute', handler, true);
     }
 
     return {
-        heading$: heading$.asObservable().pipe(filter(h => h != null)),
+        heading$: heading$.asObservable().pipe(filter((h) => h != null)),
     };
 };
