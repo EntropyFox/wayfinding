@@ -23,7 +23,7 @@ export const WayfindingRenderer = async (
     // Initialize engine and scene
     const engine = new Engine(canvas, true);
     const scene = initializeScene(engine)(canvas);
-    scene.clearColor = new Color4(0, 0, 0, 1);
+    scene.clearColor = new Color4(0, 0, 0, 0);
 
     // This creates and positions a device orientation camera
     var camera = new DeviceOrientationCamera(

@@ -30,6 +30,10 @@ export const WayFinding = async () => {
         'renderCanvasWayfinding'
     ) as HTMLCanvasElement;
 
+    //const sensors = Sensors();
+    const compass = await Compass();
+    const geoLocation = GeoLocation(skjoldungerne);
+
     /// Video
     const videoConstraint: MediaTrackConstraints = isMobile()
         ? {
@@ -56,10 +60,6 @@ export const WayFinding = async () => {
     canvas.height = video.videoHeight;
 
     // Hardcoded heading can give troubles on desktop
-
-    //const sensors = Sensors();
-    const compass = await Compass();
-    const geoLocation = GeoLocation(skjoldungerne);
 
     const heading = await firstValueFrom(compass.heading$);
     console.log('heading: ', heading);
