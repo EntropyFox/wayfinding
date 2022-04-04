@@ -6,6 +6,7 @@ import { Compass } from './compass';
 import { GeoLocation, GeoPoint } from './geolocation';
 import { first, map, mergeMap, tap } from 'rxjs/operators';
 import { WayfindingRenderer as WayfindingRenderer } from './wayfinding.renderer';
+import { firstValueFrom } from 'rxjs';
 
 export const WayFinding = async () => {
     console.log('Way finding');
@@ -60,7 +61,8 @@ export const WayFinding = async () => {
     const compass = await Compass();
     const geoLocation = GeoLocation(skjoldungerne);
 
-    const heading = await compass.heading$.toPromise();
+    const heading = await firstValueFrom(compass.heading$);
+    console.log('heading: ', heading);
     const renderer = await WayfindingRenderer(canvas, heading);
 
     const updateModel = (angleToPoint: number) => (heading: number) => {
@@ -75,8 +77,8 @@ export const WayFinding = async () => {
             angle.radians() - angleToPoint,
             0
         );
-        renderer.content.rotationQuaternion = modelQuaternion;
-        renderer.particles.rotationQuaternion = particleQuaternion;
+        // renderer.content.rotationQuaternion = modelQuaternion;
+        // renderer.particles.rotationQuaternion = particleQuaternion;
     };
 
     geoLocation.geolocation$
