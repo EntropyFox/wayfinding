@@ -45,6 +45,20 @@
             margin-top: calc(50% - 2rem);
  
         }
+
+        #debug2 {
+            position: fixed;
+            top: 0px;
+            right: 0px;
+            width: 33vw;
+            color: white;
+            font-size: 10px;
+            z-index: 2000;
+            border: 1px white solid;
+            min-height: 2em;
+            padding: .25em;
+            background-color: rgba(255,255,255,.2);
+        }
         
     </style>
 </head>
@@ -54,7 +68,11 @@
     
 
     <div id="sensor-content">
+        <video id="webcam" muted playsinline></video>
         <canvas id="renderCanvasWayfinding"></canvas>
+        <div id="hud">
+            <span>Distance</span>
+        </div>
     </div>
 
 
@@ -79,6 +97,9 @@
 
     </div>
 
+    <div id="debug2" >
+
+    </div>
 
 
 </body>

@@ -1,39 +1,41 @@
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, filter } from 'rxjs';
 
-export const Compass = () => {
-    alert(navigator.userAgent);
-
+export const Compass = async () => {
     const isIOS =
         navigator.userAgent.match(/(iPod|iPhone|iPad)/) &&
         navigator.userAgent.match(/AppleWebKit/);
 
-    const heading$ = new BehaviorSubject<number>(0);
+    const isMobile =
+        navigator.userAgent.match(/Android|webOS|iPhone|iPad|iPod/i) !== null;
+
+    const heading$ = new BehaviorSubject<number>(null);
 
     const handler = (e) => {
-        // Der foregår noget underligt her!? Jeg får skiftene værdier på "heading"
-        // Den fyrer hver gang én af akserne ændrer sig?
-        const heading = e.webkitCompassHeading || Math.abs(e.alpha - 360);
-
+        /// On desktop we set heading to 0 (North)
+        let heading = 45;
+        if (isMobile) {
+            heading = e.webkitCompassHeading || Math.abs(e.alpha - 360);
+        }
         heading$.next(heading);
     };
 
     if (isIOS) {
-        (DeviceOrientationEvent as any)
-            .requestPermission()
-            .then((response) => {
-                if (response === 'granted') {
-                    alert("it's iOS");
-                    window.addEventListener('deviceorientation', handler, true);
-                } else {
-                    alert('has to be allowed!');
-                }
-            })
-            .catch(() => alert('not supported'));
+        try {
+            const response = await (
+                DeviceOrientationEvent as any
+            ).requestPermission();
+            if (response === 'granted') {
+                window.addEventListener('deviceorientation', handler, true);
+            } else {
+            }
+        } catch (error) {
+            console.log('Not suppoerted');
+        }
     } else {
         window.addEventListener('deviceorientationabsolute', handler, true);
     }
 
     return {
-        heading$: heading$.asObservable(),
+        heading$: heading$.asObservable().pipe(filter((h) => h != null)),
     };
 };

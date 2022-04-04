@@ -1,8 +1,12 @@
+import '../styles/wayfinding.css';
 import { Angle, Quaternion } from '@babylonjs/core';
-import { first, map, mergeMap, tap } from 'rxjs/operators';
+import { GetConstraint } from '../element-factories/video.factory';
+import { isMobile } from '../webcam.manager';
 import { Compass } from './compass';
 import { GeoLocation, GeoPoint } from './geolocation';
+import { first, map, mergeMap, tap } from 'rxjs/operators';
 import { WayfindingRenderer as WayfindingRenderer } from './wayfinding.renderer';
+import { firstValueFrom } from 'rxjs';
 
 export const WayFinding = async () => {
     console.log('Way finding');
@@ -25,13 +29,40 @@ export const WayFinding = async () => {
     const canvas = document.getElementById(
         'renderCanvasWayfinding'
     ) as HTMLCanvasElement;
+
     //const sensors = Sensors();
     const compass = await Compass();
-    const geoLocation = GeoLocation(engKiosken);
-    //let renderer: UnboxPromise<WayfindingRendere>;
+    const geoLocation = GeoLocation(skjoldungerne);
+
+    /// Video
+    const videoConstraint: MediaTrackConstraints = isMobile()
+        ? {
+              width:
+                  window.innerHeight ||
+                  document.documentElement.clientHeight ||
+                  document.body.clientHeight,
+              height:
+                  window.innerWidth ||
+                  document.documentElement.clientWidth ||
+                  document.body.clientWidth,
+              facingMode: 'environment',
+          }
+        : GetConstraint('vga');
+    const video = document.getElementById('webcam') as HTMLVideoElement;
+    const stream = await navigator.mediaDevices.getUserMedia({
+        video: videoConstraint,
+        audio: false,
+    });
+    video.srcObject = stream;
+    await video.play().then();
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
 
     // Hardcoded heading can give troubles on desktop
-    const heading = 30; //await compass.heading$.toPromise();
+
+    const heading = await firstValueFrom(compass.heading$);
+    console.log('heading: ', heading);
     const renderer = await WayfindingRenderer(canvas, heading);
 
     const updateModel = (angleToPoint: number) => (heading: number) => {
@@ -46,8 +77,8 @@ export const WayFinding = async () => {
             angle.radians() - angleToPoint,
             0
         );
-        renderer.content.rotationQuaternion = modelQuaternion;
-        renderer.particles.rotationQuaternion = particleQuaternion;
+        // renderer.content.rotationQuaternion = modelQuaternion;
+        // renderer.particles.rotationQuaternion = particleQuaternion;
     };
 
     geoLocation.geolocation$
