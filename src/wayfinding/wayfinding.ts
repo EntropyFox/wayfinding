@@ -60,7 +60,7 @@ export const WayFinding = async () => {
     const compass = await Compass();
     const geoLocation = GeoLocation(skjoldungerne);
 
-    const heading = await compass.heading$.toPromise();
+    const heading = 30; //await compass.heading$.toPromise();
     const renderer = await WayfindingRenderer(canvas, heading);
 
     const updateModel = (angleToPoint: number) => (heading: number) => {

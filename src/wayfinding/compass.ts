@@ -1,8 +1,6 @@
 import { BehaviorSubject } from 'rxjs';
 
 export const Compass = () => {
-    alert(navigator.userAgent);
-
     const isIOS =
         navigator.userAgent.match(/(iPod|iPhone|iPad)/) &&
         navigator.userAgent.match(/AppleWebKit/);
@@ -13,7 +11,7 @@ export const Compass = () => {
         // Der foregår noget underligt her!? Jeg får skiftene værdier på "heading"
         // Den fyrer hver gang én af akserne ændrer sig?
         const heading = e.webkitCompassHeading || Math.abs(e.alpha - 360);
-
+        document.getElementById('debug2').innerHTML = `heading is ${heading}`;
         heading$.next(heading);
     };
 

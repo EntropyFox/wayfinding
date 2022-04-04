@@ -26,7 +26,7 @@ export const WayfindingRenderer = async (
     const scene = initializeScene(engine)(canvas);
     scene.clearColor = new Color4(0, 0, 0, 1);
 
-    /********** DEVICE ORIENTATION CAMERA EXAMPLE **************************/
+    /********** DEVICE ORIENTATION CAMERA  **************************/
 
     // This creates and positions a device orientation camera
     var camera = new DeviceOrientationCamera(
@@ -35,11 +35,11 @@ export const WayfindingRenderer = async (
         scene
     );
 
-    // This targets the camera to scene origin
-
     // This attaches the camera to the canvas
     camera.attachControl(canvas, true);
     scene.setActiveCameraByName('DevOr_camera');
+
+    /********** END DEVICE ORIENTATION CAMERA  **************************/
 
     const northVector = new Vector3(0, 0, 10);
     const quat = Quaternion.FromEulerAngles(
@@ -49,11 +49,10 @@ export const WayfindingRenderer = async (
     );
     let headingVector = Vector3.Zero();
     northVector.rotateByQuaternionToRef(quat, headingVector);
-    camera.setTarget(northVector);
-    console.log('northVector: ', headingVector);
 
-    // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
-    //var light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
+    camera.setTarget(northVector);
+
+    console.log('northVector: ', headingVector);
 
     const content = new TransformNode('content', scene);
     const particles = new TransformNode('particles', scene);
@@ -61,7 +60,7 @@ export const WayfindingRenderer = async (
     // GridMaterial
     const gridMaterial = new GridMaterial('grid', scene);
 
-    gridMaterial.lineColor = new Color3(0, 0.5, 1);
+    gridMaterial.lineColor = new Color3(1, 0.75, 0);
     gridMaterial.mainColor = new Color3(0, 0, 0);
     gridMaterial.opacity = 1;
     gridMaterial.gridRatio = 0.1;
@@ -74,10 +73,13 @@ export const WayfindingRenderer = async (
     ground.material = gridMaterial;
 
     // Create North Arrow
-    const nordpil = MeshBuilder.CreateDisc('disc', { tessellation: 3 });
+    const nordpil = MeshBuilder.CreateDisc('nordpil', {
+        tessellation: 3,
+        arc: 0.75,
+    });
     nordpil.rotationQuaternion = Quaternion.FromEulerAngles(
         Angle.FromDegrees(90).radians(),
-        Angle.FromDegrees(-90).radians(),
+        Angle.FromDegrees(45).radians(),
         0
     );
     nordpil.position = new Vector3(0, 0.1, 0);
