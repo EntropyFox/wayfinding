@@ -31,7 +31,7 @@ export const WayFinding = async () => {
     //let renderer: UnboxPromise<WayfindingRendere>;
 
     // Hardcoded heading can give troubles on desktop
-    const heading = await compass.heading$.toPromise();
+    const heading = 30; //await compass.heading$.toPromise();
     const renderer = await WayfindingRenderer(canvas, heading);
 
     const updateModel = (angleToPoint: number) => (heading: number) => {
