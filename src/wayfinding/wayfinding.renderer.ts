@@ -4,8 +4,6 @@ import {
     Engine,
     MeshBuilder,
     Quaternion,
-    ParticleSystem,
-    Texture,
     TransformNode,
     Vector3,
     DeviceOrientationCamera,
@@ -27,8 +25,6 @@ export const WayfindingRenderer = async (
     const scene = initializeScene(engine)(canvas);
     scene.clearColor = new Color4(0, 0, 0, 1);
 
-    /********** DEVICE ORIENTATION CAMERA  **************************/
-
     // This creates and positions a device orientation camera
     var camera = new DeviceOrientationCamera(
         'DevOr_camera',
@@ -40,8 +36,6 @@ export const WayfindingRenderer = async (
     camera.attachControl(canvas, true);
     scene.setActiveCameraByName('DevOr_camera');
 
-    /********** END DEVICE ORIENTATION CAMERA  **************************/
-
     const northVector = new Vector3(0, 0, 10);
     const quat = Quaternion.FromEulerAngles(
         0,
@@ -50,12 +44,8 @@ export const WayfindingRenderer = async (
     );
     let headingVector = Vector3.Zero();
     northVector.rotateByQuaternionToRef(quat, headingVector);
-    camera.setTarget(headingVector);
-    console.log('headingVector: ', northVector);
-
+    // camera.setTarget(headingVector);
     camera.setTarget(northVector);
-
-    console.log('northVector: ', headingVector);
 
     const world = new TransformNode('world', scene);
     const content = new TransformNode('content', scene);
@@ -116,7 +106,7 @@ export const WayfindingRenderer = async (
 
     const particles = Particles(scene);
 
-    scene.debugLayer.show();
+    // scene.debugLayer.show();
 
     engine.runRenderLoop(() => {
         scene.render();
@@ -128,6 +118,9 @@ export const WayfindingRenderer = async (
     return {
         content,
         particles,
+        updateCamera: (heading: number) => {
+            // camera.setTarget()
+        }
     };
 };
 
