@@ -1,11 +1,11 @@
-import "../styles/wayfinding.css"; 
-import { Angle, Quaternion } from "@babylonjs/core";
-import { map, mergeMap, tap } from "rxjs/operators";
-import { GetConstraint } from "../element-factories/video.factory";
-import { isMobile } from "../webcam.manager";
-import { Compass } from "./compass";
-import { GeoLocation, GeoPoint } from "./geolocation";
-import { WayfindingRendere } from "./wayfinding.renderer";
+import '../styles/wayfinding.css';
+import { Angle, Quaternion } from '@babylonjs/core';
+import { GetConstraint } from '../element-factories/video.factory';
+import { isMobile } from '../webcam.manager';
+import { Compass } from './compass';
+import { GeoLocation, GeoPoint } from './geolocation';
+import { first, map, mergeMap, tap } from 'rxjs/operators';
+import { WayfindingRenderer as WayfindingRenderer } from './wayfinding.renderer';
 
 export const WayFinding = async () => {
     console.log('Way finding');
@@ -20,20 +20,29 @@ export const WayFinding = async () => {
         lng: 11.971625664068533,
     };
 
+    const engKiosken: GeoPoint = {
+        lat: 55.66936930537146,
+        lng: 12.545206068647586,
+    };
+
     const canvas = document.getElementById(
         'renderCanvasWayfinding'
     ) as HTMLCanvasElement;
-    //const sensors = Sensors();
-    const compass = await Compass();
-    const geoLocation = GeoLocation(skjoldungerne);
-    const renderer = await WayfindingRendere(canvas);
-    
+
     /// Video
-    const videoConstraint: MediaTrackConstraints = isMobile() ? {
-        width: (window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight),
-        height: (window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth),
-        facingMode: 'environment',
-    } : GetConstraint('vga');
+    const videoConstraint: MediaTrackConstraints = isMobile()
+        ? {
+              width:
+                  window.innerHeight ||
+                  document.documentElement.clientHeight ||
+                  document.body.clientHeight,
+              height:
+                  window.innerWidth ||
+                  document.documentElement.clientWidth ||
+                  document.body.clientWidth,
+              facingMode: 'environment',
+          }
+        : GetConstraint('vga');
     const video = document.getElementById('webcam') as HTMLVideoElement;
     const stream = await navigator.mediaDevices.getUserMedia({
         video: videoConstraint,
@@ -44,12 +53,30 @@ export const WayFinding = async () => {
 
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-    
+
+    // Hardcoded heading can give troubles on desktop
+
+    //const sensors = Sensors();
+    const compass = await Compass();
+    const geoLocation = GeoLocation(skjoldungerne);
+
+    const heading = await compass.heading$.toPromise();
+    const renderer = await WayfindingRenderer(canvas, heading);
 
     const updateModel = (angleToPoint: number) => (heading: number) => {
         const angle = Angle.FromDegrees(heading);
-        const modelQuaternion = Quaternion.FromEulerAngles(0, 0, angle.radians() - angleToPoint);
+        const modelQuaternion = Quaternion.FromEulerAngles(
+            0,
+            angle.radians() - angleToPoint,
+            0
+        );
+        const particleQuaternion = Quaternion.FromEulerAngles(
+            0,
+            angle.radians() - angleToPoint,
+            0
+        );
         renderer.content.rotationQuaternion = modelQuaternion;
+        renderer.particles.rotationQuaternion = particleQuaternion;
     };
 
     geoLocation.geolocation$
@@ -61,7 +88,10 @@ export const WayFinding = async () => {
                 };
             }),
             mergeMap((geoloc) => {
-                return compass.heading$.pipe(tap(updateModel(geoloc.angle)));
+                return compass.heading$.pipe(
+                    first(),
+                    tap(updateModel(geoloc.angle))
+                );
             })
         )
         .subscribe();

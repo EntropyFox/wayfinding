@@ -1,4 +1,4 @@
-# AR Tracker (Browser)
+# Wayfinding
 This projects purpose is to develop tracking without messing up the viewer. 
 
 ## Configure and build
