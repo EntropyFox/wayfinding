@@ -1,6 +1,8 @@
 import { BehaviorSubject } from 'rxjs';
 
 export const Compass = () => {
+    alert(navigator.userAgent);
+
     const isIOS =
         navigator.userAgent.match(/(iPod|iPhone|iPad)/) &&
         navigator.userAgent.match(/AppleWebKit/);
@@ -8,7 +10,10 @@ export const Compass = () => {
     const heading$ = new BehaviorSubject<number>(0);
 
     const handler = (e) => {
+        // Der foregår noget underligt her!? Jeg får skiftene værdier på "heading"
+        // Den fyrer hver gang én af akserne ændrer sig?
         const heading = e.webkitCompassHeading || Math.abs(e.alpha - 360);
+
         heading$.next(heading);
     };
 
@@ -17,6 +22,7 @@ export const Compass = () => {
             .requestPermission()
             .then((response) => {
                 if (response === 'granted') {
+                    alert("it's iOS");
                     window.addEventListener('deviceorientation', handler, true);
                 } else {
                     alert('has to be allowed!');

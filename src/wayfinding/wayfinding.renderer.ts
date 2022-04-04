@@ -17,7 +17,7 @@ import {
 import { GridMaterial } from '@babylonjs/materials';
 import { initializeScene } from '../webgl/scene.setup';
 
-export const WayfindingRendere = async (
+export const WayfindingRenderer = async (
     canvas: HTMLCanvasElement,
     heading?: number
 ) => {
@@ -187,4 +187,4 @@ export const WayfindingRendere = async (
     };
 };
 
-export type WayfindingRendere = ReturnType<typeof WayfindingRendere>;
+export type WayfindingRendere = ReturnType<typeof WayfindingRenderer>;

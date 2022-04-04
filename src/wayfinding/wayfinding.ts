@@ -2,7 +2,7 @@ import { Angle, Quaternion } from '@babylonjs/core';
 import { first, map, mergeMap, tap } from 'rxjs/operators';
 import { Compass } from './compass';
 import { GeoLocation, GeoPoint } from './geolocation';
-import { WayfindingRendere } from './wayfinding.renderer';
+import { WayfindingRenderer as WayfindingRenderer } from './wayfinding.renderer';
 
 export const WayFinding = async () => {
     console.log('Way finding');
@@ -17,18 +17,22 @@ export const WayFinding = async () => {
         lng: 11.971625664068533,
     };
 
+    const engKiosken: GeoPoint = {
+        lat: 55.66936930537146,
+        lng: 12.545206068647586,
+    };
+
     const canvas = document.getElementById(
         'renderCanvasWayfinding'
     ) as HTMLCanvasElement;
     //const sensors = Sensors();
     const compass = await Compass();
-    const geoLocation = GeoLocation(skjoldungerne);
-    // let renderer: UnboxPromise<WayfindingRendere>;
+    const geoLocation = GeoLocation(engKiosken);
+    //let renderer: UnboxPromise<WayfindingRendere>;
 
     // Hardcoded heading can give troubles on desktop
-    const heading = 30; //await compass.heading$.toPromise();
-    console.log('heading: ', heading);
-    const renderer = await WayfindingRendere(canvas, heading);
+    const heading = await compass.heading$.toPromise();
+    const renderer = await WayfindingRenderer(canvas, heading);
 
     const updateModel = (angleToPoint: number) => (heading: number) => {
         const angle = Angle.FromDegrees(heading);
