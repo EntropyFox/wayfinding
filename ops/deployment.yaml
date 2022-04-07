@@ -16,13 +16,13 @@ spec:
         - name: wayfinding
           image: registry.gitlab.com/holofox/hololink/wayfinding:latest
           imagePullPolicy: Always
-          # resources:
-          #   limits:
-          #     memory: 512Mi
-          #     cpu: "0.5"
-          #   requests:
-          #     memory: 256Mi
-          #     cpu: "0.25"
+          resources:
+            requests:
+              memory: 2Mi
+              cpu: "1m"
+            limits:
+              memory: 8Mi
+              cpu: "3m"
           ports:
           - containerPort: 80
             protocol: TCP
