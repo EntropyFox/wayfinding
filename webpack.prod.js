@@ -24,7 +24,8 @@ module.exports = env => {
         plugins: [
             new CleanWebpackPlugin(),
             new webpack.DefinePlugin({
-                'process.env.MODE': JSON.stringify(env.MODE)
+                'process.env.MODE': JSON.stringify(env.MODE),
+                'process.env.SYSTEM': JSON.stringify(env.SYSTEM)
             })],
     });
 

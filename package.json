@@ -8,7 +8,7 @@
     "dev": "webpack serve --inline --open --config webpack.dev.js",
     "dev:image": "webpack serve --env=MODE='image' --inline --open --config webpack.dev.js",
     "dev:wayfinding": "webpack serve --env=SYSTEM='wayfinding' --inline --open --config webpack.dev.js",
-    "build": "webpack --config webpack.prod.js"
+    "build": "webpack --env=SYSTEM='wayfinding' --config webpack.prod.js"
   },
   "author": "Hololink",
   "license": "ISC",
