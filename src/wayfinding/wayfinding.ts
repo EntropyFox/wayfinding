@@ -1,5 +1,5 @@
 import '../styles/wayfinding.css';
-import { Angle, Quaternion } from '@babylonjs/core';
+import { Angle, Quaternion, Vector3 } from '@babylonjs/core';
 import { GetConstraint } from '../element-factories/video.factory';
 import { isMobile } from '../webcam.manager';
 import { Compass } from './compass';
@@ -47,7 +47,7 @@ export const WayFinding = async () => {
                   document.body.clientWidth,
               facingMode: 'environment',
           }
-        : GetConstraint('vga');
+        : GetConstraint('full');
     const video = document.getElementById('webcam') as HTMLVideoElement;
     const stream = await navigator.mediaDevices.getUserMedia({
         video: videoConstraint,
@@ -65,21 +65,21 @@ export const WayFinding = async () => {
     console.log('heading: ', heading);
     const renderer = await WayfindingRenderer(canvas, heading);
 
-    const updateModel = (angleToPoint: number) => (heading: number) => {
-        const angle = Angle.FromDegrees(heading);
-        const modelQuaternion = Quaternion.FromEulerAngles(
-            0,
-            angle.radians() - angleToPoint,
-            0
-        );
-        const particleQuaternion = Quaternion.FromEulerAngles(
-            0,
-            angle.radians() - angleToPoint,
-            0
-        );
-        // renderer.content.rotationQuaternion = modelQuaternion;
-        // renderer.particles.rotationQuaternion = particleQuaternion;
-    };
+    // const updateModel = (angleToPoint: number) => (heading: number) => {
+    //     const angle = Angle.FromDegrees(heading);
+    //     const modelQuaternion = Quaternion.FromEulerAngles(
+    //         0,
+    //         angle.radians() - angleToPoint,
+    //         0
+    //     );
+    //     const particleQuaternion = Quaternion.FromEulerAngles(
+    //         0,
+    //         angle.radians() - angleToPoint,
+    //         0
+    //     );
+    //     // renderer.content.rotationQuaternion = modelQuaternion;
+    //     // renderer.particles.rotationQuaternion = particleQuaternion;
+    // };
 
     geoLocation.geolocation$
         .pipe(
@@ -90,9 +90,13 @@ export const WayFinding = async () => {
                 };
             }),
             mergeMap((geoloc) => {
+                //const dir = renderer.camera.getDirection(Vector3.Up());
+                document.getElementById(
+                    'cameraDir'
+                ).innerHTML = `${geoloc.angle}`;
                 return compass.heading$.pipe(
-                    first(),
-                    tap(updateModel(geoloc.angle))
+                    first()
+                    ///tap(updateModel(geoloc.angle))
                 );
             })
         )
