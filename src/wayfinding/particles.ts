@@ -14,9 +14,9 @@ export const Particles = (scene: Scene) => {
     // We don't have to load the particles in this callback
 
     const emitterBox = MeshBuilder.CreateBox('emitter', { size: 2 });
-    emitterBox.position = new Vector3(2, 0, 0);
-    emitterBox.setPivotPoint(new Vector3(-2, 0, 0));
-    emitterBox.visibility = 0.4;
+    emitterBox.position = new Vector3(5, 0, 0);
+    emitterBox.setPivotPoint(new Vector3(-5, 0, 0));
+    emitterBox.visibility = 0.0;
 
     // Create a particle system
     const particleSystem = new ParticleSystem('particles', 2000, scene);
@@ -44,11 +44,11 @@ export const Particles = (scene: Scene) => {
     particleSystem.maxSize = 0.2;
 
     // Life time of each particle (random between...
-    particleSystem.minLifeTime = 2;
-    particleSystem.maxLifeTime = 4;
+    particleSystem.minLifeTime = 5;
+    particleSystem.maxLifeTime = 10;
 
     // Emission rate
-    particleSystem.emitRate = 250;
+    particleSystem.emitRate = 100;
 
     // Blend mode : BLENDMODE_ONEONE, or BLENDMODE_STANDARD
     particleSystem.blendMode = ParticleSystem.BLENDMODE_STANDARD;
