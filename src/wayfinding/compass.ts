@@ -15,6 +15,9 @@ export const Compass = async () => {
         let heading = 45;
         if (isMobile) {
             heading = e.webkitCompassHeading || Math.abs(e.alpha - 360);
+            document.getElementById(
+                'heading'
+            ).innerHTML = `<div>heading is</div>${Math.round(heading)}`;
         }
         heading$.next(heading);
     };

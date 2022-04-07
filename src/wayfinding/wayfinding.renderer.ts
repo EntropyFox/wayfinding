@@ -120,7 +120,8 @@ export const WayfindingRenderer = async (
         particles,
         updateCamera: (heading: number) => {
             // camera.setTarget()
-        }
+        },
+        camera,
     };
 };
 

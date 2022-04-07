@@ -1,4 +1,12 @@
-import { Color4, MeshBuilder, ParticleSystem, Scene, Texture, TransformNode, Vector3 } from "@babylonjs/core";
+import {
+    Color4,
+    MeshBuilder,
+    ParticleSystem,
+    Scene,
+    Texture,
+    TransformNode,
+    Vector3,
+} from '@babylonjs/core';
 
 export const Particles = (scene: Scene) => {
     const particles = new TransformNode('particles', scene);
@@ -21,7 +29,10 @@ export const Particles = (scene: Scene) => {
     particleSystem.maxEmitBox = new Vector3(1, 2, -2); // To...
 
     //Texture of each particle
-    particleSystem.particleTexture = new Texture('/textures/flare.png', scene);
+    particleSystem.particleTexture = new Texture(
+        '/textures/single-note.png',
+        scene
+    );
 
     // Colors of all particles
     particleSystem.color1 = new Color4(0.8, 0.7, 1.5, 2);
@@ -40,7 +51,7 @@ export const Particles = (scene: Scene) => {
     particleSystem.emitRate = 250;
 
     // Blend mode : BLENDMODE_ONEONE, or BLENDMODE_STANDARD
-    particleSystem.blendMode = ParticleSystem.BLENDMODE_ADD;
+    particleSystem.blendMode = ParticleSystem.BLENDMODE_STANDARD;
 
     // Set the gravity of all particles
     //particleSystem.gravity = new Vector3(0, -9.81, 0);
@@ -51,7 +62,7 @@ export const Particles = (scene: Scene) => {
 
     // Angular speed, in radians
     particleSystem.minAngularSpeed = 0;
-    particleSystem.maxAngularSpeed = Math.PI;
+    particleSystem.maxAngularSpeed = 0.001;
 
     // Speed
     particleSystem.minEmitPower = 1;
@@ -69,4 +80,4 @@ export const Particles = (scene: Scene) => {
     // ************************************************
 
     return particles;
-}
+};
