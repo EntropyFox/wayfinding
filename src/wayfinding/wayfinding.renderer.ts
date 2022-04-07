@@ -51,20 +51,20 @@ export const WayfindingRenderer = async (
     const content = new TransformNode('content', scene);
 
     // GridMaterial
-    const gridMaterial = new GridMaterial('grid', scene);
+    // const gridMaterial = new GridMaterial('grid', scene);
 
-    gridMaterial.lineColor = new Color3(1, 0.75, 0);
-    gridMaterial.mainColor = new Color3(0, 0, 0);
-    gridMaterial.opacity = 1;
-    gridMaterial.gridRatio = 0.1;
-    gridMaterial.majorUnitFrequency = 10;
-    gridMaterial.minorUnitVisibility = 0.5;
-    gridMaterial.gridOffset = new Vector3(0, 0, 0);
+    // gridMaterial.lineColor = new Color3(1, 0.75, 0);
+    // gridMaterial.mainColor = new Color3(0, 0, 0);
+    // gridMaterial.opacity = 1;
+    // gridMaterial.gridRatio = 0.1;
+    // gridMaterial.majorUnitFrequency = 10;
+    // gridMaterial.minorUnitVisibility = 0.5;
+    // gridMaterial.gridOffset = new Vector3(0, 0, 0);
 
-    // Ground
-    const ground = Mesh.CreateGround(`ground`, 6.01, 6.01, 10, scene);
-    ground.parent = world;
-    ground.material = gridMaterial;
+    // // Ground
+    // const ground = Mesh.CreateGround(`ground`, 6.01, 6.01, 10, scene);
+    // ground.parent = world;
+    // ground.material = gridMaterial;
 
     // Create North Arrow
     const nordpil = MeshBuilder.CreateDisc('nordpil', {
