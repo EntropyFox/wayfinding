@@ -19,4 +19,69 @@ body {
     position: absolute;
     left: var(--video-left);
     top: var(--video-top);
+    width: 100vw;
+    height: 100vh;
+    display: block;
+    font-size: 0;
+}
+
+html,
+body {
+    width: 100vw;
+    height: 100vh;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+}
+
+#splash {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 100;
+    background-color: hsl(40deg, 90%, 60%);
+}
+#interact {
+    width: 50%;
+    padding: 2rem;
+    border-radius: 1rem;
+    font-size: 200%;
+    color: black;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    text-align: center;
+    margin: auto;
+    margin-top: calc(50% - 2rem);
+}
+
+#debug2 {
+    display: none;
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    width: 33vw;
+    color: white;
+    font-size: 12px;
+    z-index: 2000;
+    border: 1px white solid;
+    min-height: 2em;
+    padding: 0.25em;
+    background-color: rgba(255, 255, 255, 0.2);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+}
+
+#overlay {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    top: 0px;
+    right: 0px;
+    z-index: 120;
+    /* -webkit-backdrop-filter: blur(2px) brightness(50%) sepia(100%)
+        contrast(10000%) hue-rotate(-30deg);
+    backdrop-filter: blur(2px) brightness(50%) sepia(100%) contrast(5000%)
+        contrast(5000%) contrast(5000%) hue-rotate(30deg); */
+    pointer-events: none;
 }

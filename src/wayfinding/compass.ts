@@ -1,34 +1,44 @@
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, filter } from 'rxjs';
 
-export const Compass = () => {
-	const isIOS = (
-		navigator.userAgent.match(/(iPod|iPhone|iPad)/) &&
-		navigator.userAgent.match(/AppleWebKit/)
-	);
+export const Compass = async () => {
+    const isIOS =
+        navigator.userAgent.match(/(iPod|iPhone|iPad)/) &&
+        navigator.userAgent.match(/AppleWebKit/);
 
-	const heading$ = new BehaviorSubject<number>(0);
+    const isMobile =
+        navigator.userAgent.match(/Android|webOS|iPhone|iPad|iPod/i) !== null;
 
-	const handler = (e) => {
-		const heading = e.webkitCompassHeading || Math.abs(e.alpha - 360);
-		heading$.next(heading);
-	};
+    const heading$ = new BehaviorSubject<number>(null);
 
-	if (isIOS) {
-		(DeviceOrientationEvent as any)
-		.requestPermission()
-		.then((response) => {
-			if (response === "granted") {
-			window.addEventListener("deviceorientation", handler, true);
-			} else {
-			alert("has to be allowed!");
-			}
-		})
-		.catch(() => alert("not supported"));
-	} else {
-		window.addEventListener("deviceorientationabsolute", handler, true);
-	}
+    const handler = (e) => {
+        /// On desktop we set heading to 0 (North)
+        let heading = 45;
+        if (isMobile) {
+            heading = e.webkitCompassHeading || Math.abs(e.alpha - 360);
+            document.getElementById(
+                'heading'
+            ).innerHTML = `<div>heading is</div>${Math.round(heading)}`;
+        }
+        heading$.next(heading);
+    };
 
-	return {
-		heading$: heading$.asObservable()
-	}
+    if (isIOS) {
+        try {
+            const response = await (
+                DeviceOrientationEvent as any
+            ).requestPermission();
+            if (response === 'granted') {
+                window.addEventListener('deviceorientation', handler, true);
+            } else {
+            }
+        } catch (error) {
+            console.log('Not suppoerted');
+        }
+    } else {
+        window.addEventListener('deviceorientationabsolute', handler, true);
+    }
+
+    return {
+        heading$: heading$.asObservable().pipe(filter((h) => h != null)),
+    };
 };

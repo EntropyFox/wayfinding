@@ -4,21 +4,35 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-    <title>Hololink Wayfinding</title>
+    <title>Hololink Tracker</title>
+
+    <style>
+      
+        
+    </style>
 </head>
 
 <body>
 
+    
+
     <div id="sensor-content">
         <video id="webcam" muted playsinline></video>
+        <!-- <div id="overlay"></div> -->
         <canvas id="renderCanvasWayfinding"></canvas>
+        <div id="hud">
+            <span>Distance</span>
+        </div>
     </div>
 
 
     <div id="tracker-content">
+        
         <video id="inputVideo" playsinline></video>
+       
         <canvas id="videoCanvas"></canvas>
         <canvas id="renderCanvas"></canvas>
+       
 
         <div id="debug">
             <p class="debug-output">
@@ -30,7 +44,17 @@
         </div>
     </div>
 
+    <div id="splash">
 
+        <div id="interact">TAP THE SCREEN TO START</div>
+
+    </div>
+
+   <div id="debug2" >
+        <div id="heading"></div>
+        <div id="cameraDir"></div>
+    </div> 
+    
 
 </body>
 
