@@ -9,7 +9,7 @@ export const initializeScene =
             new Vector3(0, 0, 0),
             scene
         );
-        camera.minZ = 0.01;
+        camera.minZ = 0.001;
 
         /// Aproximate FOV from focal length
         /// https://learnopencv.com/approximate-focal-length-for-webcams-and-cell-phone-cameras/

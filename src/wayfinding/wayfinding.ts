@@ -61,9 +61,9 @@ export const WayFinding = async () => {
 
     // Hardcoded heading can give troubles on desktop
 
-    const heading = await firstValueFrom(compass.heading$);
-    console.log('heading: ', heading);
-    const renderer = await WayfindingRenderer(canvas, heading);
+    // const heading = await firstValueFrom(compass.heading$);
+    // console.log('heading: ', heading);
+    const renderer = await WayfindingRenderer(canvas);
 
     // const updateModel = (angleToPoint: number) => (heading: number) => {
     //     const angle = Angle.FromDegrees(heading);

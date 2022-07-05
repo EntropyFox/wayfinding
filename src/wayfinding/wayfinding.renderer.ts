@@ -8,22 +8,32 @@ import {
     Vector3,
     DeviceOrientationCamera,
     Angle,
+    MeshAssetTask,
     Mesh,
+    GlowLayer,
+    Matrix,
     Color3,
     StandardMaterial,
+    HighlightLayer,
+    setAndStartTimer,
+    AdvancedTimer,
+    Scene,
+    ActionManager,
+    ExecuteCodeAction,
 } from '@babylonjs/core';
-import { GridMaterial } from '@babylonjs/materials';
 import { initializeScene } from '../webgl/scene.setup';
-import { Particles } from './particles';
 
-export const WayfindingRenderer = async (
-    canvas: HTMLCanvasElement,
-    heading?: number
-) => {
+import '@babylonjs/core/Debug/debugLayer';
+import '@babylonjs/inspector';
+import { AdvancedDynamicTexture, Button, Control } from '@babylonjs/gui';
+
+export const WayfindingRenderer = async (canvas: HTMLCanvasElement) => {
     // Initialize engine and scene
     const engine = new Engine(canvas, true);
     const scene = initializeScene(engine)(canvas);
     scene.clearColor = new Color4(0, 0, 0, 0);
+
+    // scene.debugLayer.show();
 
     // This creates and positions a device orientation camera
     var camera = new DeviceOrientationCamera(
@@ -36,6 +46,9 @@ export const WayfindingRenderer = async (
     camera.attachControl(canvas, true);
     scene.setActiveCameraByName('DevOr_camera');
 
+    /// Glow is cool
+    const gl = new GlowLayer('glow', scene);
+
     const northVector = new Vector3(0, 0, 10);
     const quat = Quaternion.FromEulerAngles(
         0,
@@ -47,66 +60,261 @@ export const WayfindingRenderer = async (
     // camera.setTarget(headingVector);
     camera.setTarget(northVector);
 
-    const world = new TransformNode('world', scene);
-    const content = new TransformNode('content', scene);
+    /// Game settings
+    let squidLives = 15;
+    let playerLives = 5;
+    let gameStarted = false;
 
-    // GridMaterial
-    // const gridMaterial = new GridMaterial('grid', scene);
+    /// Nodes and squid
+    const squidbox = new TransformNode('squidbox', scene);
+    const content = new TransformNode('content');
+    content.position = new Vector3(0, 0, -30);
+    content.parent = squidbox;
 
-    // gridMaterial.lineColor = new Color3(1, 0.75, 0);
-    // gridMaterial.mainColor = new Color3(0, 0, 0);
-    // gridMaterial.opacity = 1;
-    // gridMaterial.gridRatio = 0.1;
-    // gridMaterial.majorUnitFrequency = 10;
-    // gridMaterial.minorUnitVisibility = 0.5;
-    // gridMaterial.gridOffset = new Vector3(0, 0, 0);
-
-    // // Ground
-    // const ground = Mesh.CreateGround(`ground`, 6.01, 6.01, 10, scene);
-    // ground.parent = world;
-    // ground.material = gridMaterial;
-
-    // Create North Arrow
-    const nordpil = MeshBuilder.CreateDisc('nordpil', {
-        tessellation: 3,
-        arc: 0.75,
-    });
-    nordpil.rotationQuaternion = Quaternion.FromEulerAngles(
-        Angle.FromDegrees(90).radians(),
-        Angle.FromDegrees(45).radians(),
-        0
-    );
-    nordpil.position = new Vector3(0, 0.1, 0);
-    const red = new StandardMaterial('red', scene);
-    red.diffuseColor = new Color3(1, 0, 0);
-    nordpil.material = red;
-    nordpil.parent = world;
-
-    /// Load destination arrow
-    const assetsManager = new AssetsManager(scene);
-    const meshTask = assetsManager.addMeshTask(
-        'Arrow task',
+    /// Load squid
+    const assetManager = new AssetsManager(scene);
+    assetManager.addMeshTask(
+        'squid',
         '',
-        'https://storage.googleapis.com/hololink/dev/arrow/',
-        'scene.gltf'
+        'https://assets.hololink.io/models/experimentarium/',
+        'Evil_Skin.glb'
     );
-    meshTask.onSuccess = (task) => {
-        console.log('task: ', task);
-        // task.loadedMeshes[0].position = new Vector3(0, 0, 1);
-        const arrow = task.loadedMeshes[0];
-        arrow.parent = content;
-        arrow.position = new Vector3(0, 0.5, 0);
-        arrow.rotationQuaternion = Quaternion.FromEulerAngles(
-            Angle.FromDegrees(90).radians(),
-            0,
-            0
-        );
+    assetManager.onTaskSuccess = (task: MeshAssetTask) => {
+        console.log(task.loadedMeshes[0]);
+        task.loadedMeshes[0].metadata = {
+            name: 'squid',
+        };
+        task.loadedMeshes[0].parent = content;
+        task.loadedAnimationGroups[0].speedRatio = 10;
     };
-    assetsManager.load();
+    assetManager.load();
 
-    const particles = Particles(scene);
+    /// Shell is the one we clone bullet from
+    const shell = MeshBuilder.CreateCylinder('shell', {
+        diameterTop: 0.2,
+        diameterBottom: 0.2,
+        height: 0.3,
+    });
+    shell.position = content.position;
+    shell.rotation = new Vector3(Math.PI / 4, 0, 0);
+    const shellGlowingMaterial = new StandardMaterial('glowing', scene);
+    shellGlowingMaterial.emissiveColor = Color3.Green();
+    shell.material = shellGlowingMaterial;
+    shell.isVisible = false;
 
-    // scene.debugLayer.show();
+    /// Timer
+    const advancedTimer = new AdvancedTimer({
+        timeout: 2000,
+        contextObservable: scene.onBeforeRenderObservable,
+    });
+
+    advancedTimer.onTimerEndedObservable.add(() => {
+        const nextShot = generateRandomInteger(4000, 10000);
+        console.log(nextShot);
+
+        advancedTimer.start(3000);
+        shot(scene, shell, shieldMesh);
+    });
+
+    /// Shield
+    const shieldMesh = MeshBuilder.CreateCylinder(
+        'shields',
+        {
+            diameter: 1,
+            height: 0.1,
+        },
+        scene
+    );
+    /// TODO Update according to camera
+    shieldMesh.position = new Vector3(0, 1.5, -2);
+    shieldMesh.rotation = new Vector3(2.1, 0, 0);
+
+    const glowingMaterial = new StandardMaterial('glowing', scene);
+    glowingMaterial.emissiveColor = Color3.Teal();
+    shieldMesh.material = glowingMaterial;
+
+    shieldMesh.setEnabled(false);
+
+    const squidMove = () => {
+        const newY = Math.random() * (2 * Math.PI + 1);
+        console.log('squidMove', newY);
+        squidbox.rotation = new Vector3(0, newY, 0);
+    };
+
+    const hl = new HighlightLayer('hl1', scene);
+    scene.onPointerDown = function castRay() {
+        if (!gameStarted || shieldMesh.isEnabled()) return;
+
+        var ray = scene.createPickingRay(
+            scene.pointerX,
+            scene.pointerY,
+            Matrix.Identity(),
+            camera
+        );
+        var hit = scene.pickWithRay(ray);
+
+        if (
+            hit.pickedMesh &&
+            hit.pickedMesh?.parent?.metadata.name == 'squid'
+        ) {
+            const eyes = <Mesh>scene.getMeshById('Eyebows_v02');
+            const kraken = <Mesh>scene.getMeshById('kraken:kraken_low');
+            /// Only allow hits if not "red"
+            if (hl.hasMesh(kraken)) {
+                return;
+            }
+            squidLives -= 1;
+            if (squidLives % 5 === 0 && squidLives > 0) {
+                squidMove();
+            }
+
+            console.log('SquidLives', squidLives);
+            hl.addMesh(kraken, Color3.Red());
+            hl.addMesh(eyes, Color3.Red());
+            if (squidLives === 0) {
+                gameWon();
+                return;
+            }
+            setAndStartTimer({
+                timeout: 750,
+                contextObservable: scene.onBeforeRenderObservable,
+                onEnded: () => {
+                    hl.removeAllMeshes();
+                },
+            });
+        }
+    };
+
+    const shot = (scene: Scene, shell: Mesh, shield: Mesh) => {
+        const speed = 0.8;
+        console.log('Squid shot');
+        const bullet = shell.clone('bullet');
+        bullet.isVisible = true;
+        bullet.actionManager = new ActionManager(scene);
+        bullet.actionManager.registerAction(
+            new ExecuteCodeAction(
+                {
+                    trigger: ActionManager.OnIntersectionEnterTrigger,
+                    parameter: shield,
+                },
+                () => {
+                    if (shield.isEnabled()) {
+                        console.log('Shield');
+
+                        (<StandardMaterial>shieldMesh.material).emissiveColor =
+                            Color3.Magenta();
+                        setAndStartTimer({
+                            timeout: 750,
+                            contextObservable: scene.onBeforeRenderObservable,
+                            onEnded: () => {
+                                (<StandardMaterial>(
+                                    shieldMesh.material
+                                )).emissiveColor = Color3.Teal();
+                            },
+                        });
+
+                        bullet.dispose();
+                    }
+                }
+            )
+        );
+
+        const bulletVector = camera.position
+            .subtract(bullet.position)
+            .normalize();
+        console.log('bulletVector: ', bulletVector);
+
+        bullet.onBeforeRenderObservable.add(() => {
+            bullet.position.addInPlace(bulletVector.scale(speed));
+            // bullet.position.z += speed;
+            if (bullet.position.z > -0.8) {
+                bullet.dispose();
+                playerLives -= 1;
+                console.log('Player hit lives left', playerLives);
+                if (playerLives === 0) {
+                    gameLost();
+                }
+            }
+        });
+    };
+
+    const shield = () => {
+        shieldMesh.setEnabled(!shieldMesh.isEnabled());
+    };
+
+    // UI
+    var advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI('UI');
+    const btnColor = '#4C8CF9';
+
+    const shieldBtn = Button.CreateSimpleButton('but1', 'Skjold');
+    shieldBtn.width = '150px';
+    shieldBtn.height = '40px';
+    shieldBtn.color = 'white';
+    shieldBtn.cornerRadius = 20;
+    shieldBtn.background = btnColor;
+    shieldBtn.top = '30%';
+    // shieldBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+    // shieldBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+    shieldBtn.onPointerUpObservable.add(() => {
+        shield();
+    });
+    shieldBtn.isVisible = false;
+    advancedTexture.addControl(shieldBtn);
+
+    var btnStart = Button.CreateSimpleButton('but1', 'Start');
+    btnStart.width = '150px';
+    btnStart.height = '40px';
+    btnStart.color = 'white';
+    btnStart.cornerRadius = 20;
+    btnStart.background = btnColor;
+    btnStart.onPointerUpObservable.add(() => {
+        startGame();
+    });
+    advancedTexture.addControl(btnStart);
+
+    // /// Game Lost
+
+    var btnGameLost = Button.CreateSimpleButton('btnLost', 'Game Over');
+    btnGameLost.width = '150px';
+    btnGameLost.height = '40px';
+    btnGameLost.color = 'white';
+    btnGameLost.cornerRadius = 20;
+    btnGameLost.background = btnColor;
+    btnGameLost.onPointerUpObservable.add(() => {});
+    btnGameLost.isVisible = false;
+    advancedTexture.addControl(btnGameLost);
+
+    /// Game won
+    var btnGameWon = Button.CreateSimpleButton('btnLost', 'You won!');
+    btnGameWon.width = '150px';
+    btnGameWon.height = '40px';
+    btnGameWon.color = 'white';
+    btnGameWon.cornerRadius = 20;
+    btnGameWon.background = btnColor;
+    btnGameWon.onPointerUpObservable.add(() => {
+        /// TODO goto somewhere we won!
+    });
+    btnGameWon.isVisible = false;
+    advancedTexture.addControl(btnGameWon);
+
+    const startGame = () => {
+        btnStart.isVisible = false;
+        shieldBtn.isVisible = true;
+        gameStarted = true;
+        advancedTimer.start(4000);
+    };
+
+    const gameWon = () => {
+        gameStarted = false;
+        advancedTimer.stop();
+        // btnGameWon.isVisible = true;
+    };
+
+    const gameLost = () => {
+        gameStarted = false;
+        advancedTimer.stop();
+        // btnGameLost.isVisible = true;
+    };
 
     engine.runRenderLoop(() => {
         scene.render();
@@ -117,12 +325,13 @@ export const WayfindingRenderer = async (
 
     return {
         content,
-        particles,
-        updateCamera: (heading: number) => {
-            // camera.setTarget()
-        },
         camera,
     };
 };
+
+/// JA DEN ER FRA STACKOVERFLOW! OG hvad så?!?
+function generateRandomInteger(min, max) {
+    return Math.floor(min + Math.random() * (max - min + 1));
+}
 
 export type WayfindingRendere = ReturnType<typeof WayfindingRenderer>;
