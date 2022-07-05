@@ -1,0 +1,94 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: experimentariet-cert
+spec:
+  commonName: experimentariet.hololink.io
+  secretName: experimentariet-cert
+  dnsNames:
+    - experimentariet.hololink.io
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+
+---
+
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: experimentariet-squid-ingress-route
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`experimentariet-squid.hololink.io`)
+      kind: Rule
+      services:
+        - name: experimentariet-squid-service
+          port: 80
+  tls:
+    secretName: experimentariet-squid-cert
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: experimentariet-squid
+spec:
+  replicas: 2
+  selector:
+      matchLabels:
+        app: experimentariet-squid
+  template:
+      metadata:
+        labels:
+          app: experimentariet-squid
+      spec:
+        containers:
+        - name: experimentariet-squid
+          image: registry.gitlab.com/holofox/hololink/viewer:experimentariet-squid
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: 25Mi
+              cpu: "5m"
+            limits:
+              memory: 150Mi
+              cpu: "40m"
+          ports:
+          - containerPort: 80
+            protocol: TCP
+        imagePullSecrets:
+        - name: regcred
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: experimentariet-squid-service
+spec:
+  selector:
+    app: experimentariet-squid
+  ports:
+  - port: 80
+    targetPort: 80
+
+---
+
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: experimentariet-squid-http-redirect
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`experimentariet-squid.hololink.io`)
+      kind: Rule
+      services:
+        - name: experimentariet-squid-service
+          port: 80
+      middlewares:
+        - name: https-redirectscheme

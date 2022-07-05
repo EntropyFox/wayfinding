@@ -31,7 +31,11 @@ export const WayfindingRenderer = async (canvas: HTMLCanvasElement) => {
     // Initialize engine and scene
     const engine = new Engine(canvas, true);
     const scene = initializeScene(engine)(canvas);
-    scene.clearColor = new Color4(0, 0, 0, 0);
+
+    const clearColor = new Color4(0, 0, 0, 0);
+    scene.clearColor = clearColor;
+
+    var advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI('UI');
 
     // scene.debugLayer.show();
 
@@ -86,8 +90,10 @@ export const WayfindingRenderer = async (canvas: HTMLCanvasElement) => {
         };
         task.loadedMeshes[0].parent = content;
         task.loadedAnimationGroups[0].speedRatio = 10;
+        console.log('squid ready');
     };
-    assetManager.load();
+    await assetManager.loadAsync();
+    console.log('loaded');
 
     /// Shell is the one we clone bullet from
     const shell = MeshBuilder.CreateCylinder('shell', {
@@ -97,13 +103,14 @@ export const WayfindingRenderer = async (canvas: HTMLCanvasElement) => {
     });
     shell.position = content.position;
     shell.rotation = new Vector3(Math.PI / 4, 0, 0);
+    shell.parent = squidbox;
     const shellGlowingMaterial = new StandardMaterial('glowing', scene);
     shellGlowingMaterial.emissiveColor = Color3.Green();
     shell.material = shellGlowingMaterial;
     shell.isVisible = false;
 
     /// Timer
-    const advancedTimer = new AdvancedTimer({
+    let advancedTimer = new AdvancedTimer({
         timeout: 2000,
         contextObservable: scene.onBeforeRenderObservable,
     });
@@ -112,7 +119,7 @@ export const WayfindingRenderer = async (canvas: HTMLCanvasElement) => {
         const nextShot = generateRandomInteger(4000, 10000);
         console.log(nextShot);
 
-        advancedTimer.start(3000);
+        advancedTimer.start(nextShot);
         shot(scene, shell, shieldMesh);
     });
 
@@ -126,11 +133,14 @@ export const WayfindingRenderer = async (canvas: HTMLCanvasElement) => {
         scene
     );
     /// TODO Update according to camera
-    shieldMesh.position = new Vector3(0, 1.5, -2);
+    // shieldMesh.po
+    shieldMesh.parent = camera;
+    shieldMesh.position = new Vector3(0, -0.2, 2);
     shieldMesh.rotation = new Vector3(2.1, 0, 0);
 
     const glowingMaterial = new StandardMaterial('glowing', scene);
     glowingMaterial.emissiveColor = Color3.Teal();
+    glowingMaterial.alpha = 0.7;
     shieldMesh.material = glowingMaterial;
 
     shieldMesh.setEnabled(false);
@@ -228,6 +238,14 @@ export const WayfindingRenderer = async (canvas: HTMLCanvasElement) => {
             bullet.position.addInPlace(bulletVector.scale(speed));
             // bullet.position.z += speed;
             if (bullet.position.z > -0.8) {
+                scene.clearColor = new Color4(0.76, 0.05, 0.05, 0.5);
+                setAndStartTimer({
+                    timeout: 100,
+                    contextObservable: scene.onBeforeRenderObservable,
+                    onEnded: () => {
+                        scene.clearColor = new Color4(0, 0, 0, 0);
+                    },
+                });
                 bullet.dispose();
                 playerLives -= 1;
                 console.log('Player hit lives left', playerLives);
@@ -243,7 +261,6 @@ export const WayfindingRenderer = async (canvas: HTMLCanvasElement) => {
     };
 
     // UI
-    var advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI('UI');
     const btnColor = '#4C8CF9';
 
     const shieldBtn = Button.CreateSimpleButton('but1', 'Skjold');
@@ -261,7 +278,7 @@ export const WayfindingRenderer = async (canvas: HTMLCanvasElement) => {
     shieldBtn.isVisible = false;
     advancedTexture.addControl(shieldBtn);
 
-    var btnStart = Button.CreateSimpleButton('but1', 'Start');
+    const btnStart = Button.CreateSimpleButton('but1', 'Start');
     btnStart.width = '150px';
     btnStart.height = '40px';
     btnStart.color = 'white';
@@ -273,47 +290,56 @@ export const WayfindingRenderer = async (canvas: HTMLCanvasElement) => {
     advancedTexture.addControl(btnStart);
 
     // /// Game Lost
-
-    var btnGameLost = Button.CreateSimpleButton('btnLost', 'Game Over');
+    const btnGameLost = Button.CreateSimpleButton('btnLost', 'Du tabte');
     btnGameLost.width = '150px';
     btnGameLost.height = '40px';
     btnGameLost.color = 'white';
     btnGameLost.cornerRadius = 20;
     btnGameLost.background = btnColor;
-    btnGameLost.onPointerUpObservable.add(() => {});
+    btnGameLost.onPointerUpObservable.add(() => {
+        startGame();
+    });
     btnGameLost.isVisible = false;
     advancedTexture.addControl(btnGameLost);
 
     /// Game won
-    var btnGameWon = Button.CreateSimpleButton('btnLost', 'You won!');
+    const btnGameWon = Button.CreateSimpleButton('btnLost', 'Du vandt!');
     btnGameWon.width = '150px';
     btnGameWon.height = '40px';
     btnGameWon.color = 'white';
     btnGameWon.cornerRadius = 20;
     btnGameWon.background = btnColor;
     btnGameWon.onPointerUpObservable.add(() => {
-        /// TODO goto somewhere we won!
+        window.location.href =
+            'https://experimentariet.hololink.io/won/monster';
     });
     btnGameWon.isVisible = false;
     advancedTexture.addControl(btnGameWon);
 
     const startGame = () => {
+        squidLives = 15;
+        playerLives = 5;
         btnStart.isVisible = false;
         shieldBtn.isVisible = true;
+        btnGameLost.isVisible = false;
         gameStarted = true;
         advancedTimer.start(4000);
     };
 
-    const gameWon = () => {
+    const stopGame = () => {
+        shieldMesh.isEnabled(false);
         gameStarted = false;
         advancedTimer.stop();
-        // btnGameWon.isVisible = true;
+    };
+
+    const gameWon = () => {
+        stopGame();
+        btnGameWon.isVisible = true;
     };
 
     const gameLost = () => {
-        gameStarted = false;
-        advancedTimer.stop();
-        // btnGameLost.isVisible = true;
+        stopGame();
+        btnGameLost.isVisible = true;
     };
 
     engine.runRenderLoop(() => {
