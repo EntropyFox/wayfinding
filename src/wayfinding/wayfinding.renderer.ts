@@ -330,6 +330,7 @@ export const WayfindingRenderer = async (canvas: HTMLCanvasElement) => {
         shieldMesh.isEnabled(false);
         gameStarted = false;
         advancedTimer.stop();
+        window.location.reload();
     };
 
     const gameWon = () => {

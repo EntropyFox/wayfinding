@@ -1,12 +1,12 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: experimentariet-cert
+  name: experimentariet-squid-cert
 spec:
-  commonName: experimentariet.hololink.io
-  secretName: experimentariet-cert
+  commonName: experimentariet-squid.hololink.io
+  secretName: experimentariet-squid-cert
   dnsNames:
-    - experimentariet.hololink.io
+    - experimentariet-squid.hololink.io
   issuerRef:
     name: letsencrypt-prod
     kind: ClusterIssuer
