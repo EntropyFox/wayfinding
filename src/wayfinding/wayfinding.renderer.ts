@@ -25,7 +25,12 @@ import { initializeScene } from '../webgl/scene.setup';
 
 import '@babylonjs/core/Debug/debugLayer';
 import '@babylonjs/inspector';
-import { AdvancedDynamicTexture, Button, Control } from '@babylonjs/gui';
+import {
+    AdvancedDynamicTexture,
+    Button,
+    Control,
+    TextBlock,
+} from '@babylonjs/gui';
 
 export const WayfindingRenderer = async (canvas: HTMLCanvasElement) => {
     // Initialize engine and scene
@@ -90,10 +95,13 @@ export const WayfindingRenderer = async (canvas: HTMLCanvasElement) => {
         };
         task.loadedMeshes[0].parent = content;
         task.loadedAnimationGroups[0].speedRatio = 10;
-        console.log('squid ready');
     };
-    await assetManager.loadAsync();
-    console.log('loaded');
+
+    assetManager.onFinish = () => {
+        loadingText.isVisible = false;
+        btnStart.isVisible = true;
+    };
+    assetManager.load();
 
     /// Shell is the one we clone bullet from
     const shell = MeshBuilder.CreateCylinder('shell', {
@@ -147,8 +155,9 @@ export const WayfindingRenderer = async (canvas: HTMLCanvasElement) => {
 
     const squidMove = () => {
         const newY = Math.random() * (2 * Math.PI + 1);
+        const newX = Math.random() * (0.25 * Math.PI + 1);
         console.log('squidMove', newY);
-        squidbox.rotation = new Vector3(0, newY, 0);
+        squidbox.rotation = new Vector3(newX, newY, 0);
     };
 
     const hl = new HighlightLayer('hl1', scene);
@@ -196,8 +205,7 @@ export const WayfindingRenderer = async (canvas: HTMLCanvasElement) => {
     };
 
     const shot = (scene: Scene, shell: Mesh, shield: Mesh) => {
-        const speed = 0.8;
-        console.log('Squid shot');
+        const speed = 1;
         const bullet = shell.clone('bullet');
         bullet.isVisible = true;
         bullet.actionManager = new ActionManager(scene);
@@ -209,8 +217,6 @@ export const WayfindingRenderer = async (canvas: HTMLCanvasElement) => {
                 },
                 () => {
                     if (shield.isEnabled()) {
-                        console.log('Shield');
-
                         (<StandardMaterial>shieldMesh.material).emissiveColor =
                             Color3.Magenta();
                         setAndStartTimer({
@@ -229,15 +235,12 @@ export const WayfindingRenderer = async (canvas: HTMLCanvasElement) => {
             )
         );
 
-        const bulletVector = camera.position
-            .subtract(bullet.position)
-            .normalize();
-        console.log('bulletVector: ', bulletVector);
-
+        const bulletVec = camera.position.subtract(bullet.position);
         bullet.onBeforeRenderObservable.add(() => {
-            bullet.position.addInPlace(bulletVector.scale(speed));
-            // bullet.position.z += speed;
-            if (bullet.position.z > -0.8) {
+            const distance = camera.position.subtract(bullet.position).length();
+            // debugText.text = distance.toFixed(2);
+            bullet.position.addInPlace(bulletVec.normalize().scale(0.2));
+            if (distance < 1) {
                 scene.clearColor = new Color4(0.76, 0.05, 0.05, 0.5);
                 setAndStartTimer({
                     timeout: 100,
@@ -248,6 +251,7 @@ export const WayfindingRenderer = async (canvas: HTMLCanvasElement) => {
                 });
                 bullet.dispose();
                 playerLives -= 1;
+                playerLivesTxt.text = getLivesString(playerLives);
                 console.log('Player hit lives left', playerLives);
                 if (playerLives === 0) {
                     gameLost();
@@ -256,12 +260,54 @@ export const WayfindingRenderer = async (canvas: HTMLCanvasElement) => {
         });
     };
 
-    const shield = () => {
-        shieldMesh.setEnabled(!shieldMesh.isEnabled());
+    const shield = (show: boolean) => {
+        shieldMesh.setEnabled(show);
+        shieldBtn.isVisible = false;
+        setAndStartTimer({
+            timeout: 1000,
+            contextObservable: scene.onBeforeRenderObservable,
+            onEnded: () => {
+                shieldMesh.setEnabled(false);
+                shieldBtn.isVisible = true;
+            },
+        });
     };
 
     // UI
     const btnColor = '#4C8CF9';
+
+    const loadingText = new TextBlock();
+    loadingText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+    // loadingText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+    // loadingText.paddingLeft = '5px';
+    // loadingText.paddingTop = '5px';
+    loadingText.text = 'Stor blæksprutte på vej!';
+    loadingText.color = 'Red';
+    loadingText.fontSize = 24;
+    loadingText.width = '100%';
+    advancedTexture.addControl(loadingText);
+
+    const playerLivesTxt = new TextBlock();
+    playerLivesTxt.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_LEFT;
+    playerLivesTxt.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+    playerLivesTxt.paddingLeft = '5px';
+    playerLivesTxt.paddingTop = '5px';
+    playerLivesTxt.text = getLivesString(playerLives);
+    playerLivesTxt.color = 'Red';
+    playerLivesTxt.fontSize = 35;
+    playerLivesTxt.width = '100%';
+    advancedTexture.addControl(playerLivesTxt);
+
+    const debugText = new TextBlock();
+    debugText.textHorizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+    debugText.textVerticalAlignment = Control.VERTICAL_ALIGNMENT_TOP;
+    debugText.paddingLeft = '5px';
+    debugText.paddingTop = '5px';
+    // debugText.text = 'debug';
+    debugText.color = 'Red';
+    debugText.fontSize = 24;
+    debugText.width = '100%';
+    advancedTexture.addControl(debugText);
 
     const shieldBtn = Button.CreateSimpleButton('but1', 'Skjold');
     shieldBtn.width = '150px';
@@ -270,11 +316,12 @@ export const WayfindingRenderer = async (canvas: HTMLCanvasElement) => {
     shieldBtn.cornerRadius = 20;
     shieldBtn.background = btnColor;
     shieldBtn.top = '30%';
-    // shieldBtn.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-    // shieldBtn.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-    shieldBtn.onPointerUpObservable.add(() => {
-        shield();
+    shieldBtn.onPointerDownObservable.add(() => {
+        shield(true);
     });
+    // shieldBtn.onPointerUpObservable.add(() => {
+    //     shield(false);
+    // });
     shieldBtn.isVisible = false;
     advancedTexture.addControl(shieldBtn);
 
@@ -287,6 +334,7 @@ export const WayfindingRenderer = async (canvas: HTMLCanvasElement) => {
     btnStart.onPointerUpObservable.add(() => {
         startGame();
     });
+    btnStart.isVisible = false;
     advancedTexture.addControl(btnStart);
 
     // /// Game Lost
@@ -297,7 +345,8 @@ export const WayfindingRenderer = async (canvas: HTMLCanvasElement) => {
     btnGameLost.cornerRadius = 20;
     btnGameLost.background = btnColor;
     btnGameLost.onPointerUpObservable.add(() => {
-        startGame();
+        // startGame();
+        window.location.reload();
     });
     btnGameLost.isVisible = false;
     advancedTexture.addControl(btnGameLost);
@@ -330,11 +379,11 @@ export const WayfindingRenderer = async (canvas: HTMLCanvasElement) => {
         shieldMesh.isEnabled(false);
         gameStarted = false;
         advancedTimer.stop();
-        window.location.reload();
     };
 
     const gameWon = () => {
         stopGame();
+        shieldBtn.isVisible = false;
         btnGameWon.isVisible = true;
     };
 
@@ -355,6 +404,8 @@ export const WayfindingRenderer = async (canvas: HTMLCanvasElement) => {
         camera,
     };
 };
+
+const getLivesString = (lives: number) => '❤'.repeat(lives);
 
 /// JA DEN ER FRA STACKOVERFLOW! OG hvad så?!?
 function generateRandomInteger(min, max) {
