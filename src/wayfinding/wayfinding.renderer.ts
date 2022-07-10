@@ -45,7 +45,7 @@ export const WayfindingRenderer = async (canvas: HTMLCanvasElement) => {
     // scene.debugLayer.show();
 
     // This creates and positions a device orientation camera
-    var camera = new DeviceOrientationCamera(
+    const camera = new DeviceOrientationCamera(
         'DevOr_camera',
         new Vector3(0, 2, 0),
         scene
@@ -95,6 +95,11 @@ export const WayfindingRenderer = async (canvas: HTMLCanvasElement) => {
         };
         task.loadedMeshes[0].parent = content;
         task.loadedAnimationGroups[0].speedRatio = 10;
+
+        // (<Mesh>task.loadedMeshes[0]).onBeforeRenderObservable.add(() => {
+        //     if (squidOrientation)
+        //     // const length = squidbox.position.subtract(squidOrientation);
+        // });
     };
 
     assetManager.onFinish = () => {
@@ -153,11 +158,13 @@ export const WayfindingRenderer = async (canvas: HTMLCanvasElement) => {
 
     shieldMesh.setEnabled(false);
 
+    const squidOrientation = squidbox;
     const squidMove = () => {
         const newY = Math.random() * (2 * Math.PI + 1);
-        const newX = Math.random() * (0.25 * Math.PI + 1);
+        const newX = generateRandomFloat(0, Math.PI / 4, 2); //Math.random() * (Math.PI / 4) + 1;
         console.log('squidMove', newY);
         squidbox.rotation = new Vector3(newX, newY, 0);
+        squidOrientation.rotation = new Vector3(newX, newY, 0);
     };
 
     const hl = new HighlightLayer('hl1', scene);
@@ -205,9 +212,10 @@ export const WayfindingRenderer = async (canvas: HTMLCanvasElement) => {
     };
 
     const shot = (scene: Scene, shell: Mesh, shield: Mesh) => {
-        const speed = 1;
+        const speed = 0.2;
         const bullet = shell.clone('bullet');
         bullet.isVisible = true;
+        bullet.alwaysSelectAsActiveMesh = true;
         bullet.actionManager = new ActionManager(scene);
         bullet.actionManager.registerAction(
             new ExecuteCodeAction(
@@ -235,12 +243,18 @@ export const WayfindingRenderer = async (canvas: HTMLCanvasElement) => {
             )
         );
 
-        const bulletVec = camera.position.subtract(bullet.position);
+        const playerPosition = new Vector3(0, 1.5, 0);
+
+        const bulletVec = playerPosition.subtract(bullet.position);
         bullet.onBeforeRenderObservable.add(() => {
-            const distance = camera.position.subtract(bullet.position).length();
+            if (squidLives <= 0) {
+                bullet.dispose();
+            }
+            const distance = playerPosition.subtract(bullet.position).length();
             // debugText.text = distance.toFixed(2);
-            bullet.position.addInPlace(bulletVec.normalize().scale(0.2));
-            if (distance < 1) {
+            bullet.position.addInPlace(bulletVec.normalize().scale(speed));
+            /// Never take damage if shield is up
+            if (distance < 2.4 && !shieldMesh.isEnabled()) {
                 scene.clearColor = new Color4(0.76, 0.05, 0.05, 0.5);
                 setAndStartTimer({
                     timeout: 100,
@@ -264,7 +278,7 @@ export const WayfindingRenderer = async (canvas: HTMLCanvasElement) => {
         shieldMesh.setEnabled(show);
         shieldBtn.isVisible = false;
         setAndStartTimer({
-            timeout: 1000,
+            timeout: 1500,
             contextObservable: scene.onBeforeRenderObservable,
             onEnded: () => {
                 shieldMesh.setEnabled(false);
@@ -352,7 +366,7 @@ export const WayfindingRenderer = async (canvas: HTMLCanvasElement) => {
     advancedTexture.addControl(btnGameLost);
 
     /// Game won
-    const btnGameWon = Button.CreateSimpleButton('btnLost', 'Du vandt!');
+    const btnGameWon = Button.CreateSimpleButton('btnWon', 'Du vandt!');
     btnGameWon.width = '150px';
     btnGameWon.height = '40px';
     btnGameWon.color = 'white';
@@ -360,7 +374,7 @@ export const WayfindingRenderer = async (canvas: HTMLCanvasElement) => {
     btnGameWon.background = btnColor;
     btnGameWon.onPointerUpObservable.add(() => {
         window.location.href =
-            'https://experimentariet.hololink.io/won/monster';
+            'https://experimentarium.hololink.io/won/monster';
     });
     btnGameWon.isVisible = false;
     advancedTexture.addControl(btnGameWon);
@@ -410,6 +424,12 @@ const getLivesString = (lives: number) => '❤'.repeat(lives);
 /// JA DEN ER FRA STACKOVERFLOW! OG hvad så?!?
 function generateRandomInteger(min, max) {
     return Math.floor(min + Math.random() * (max - min + 1));
+}
+
+function generateRandomFloat(min, max, decimals) {
+    const str = (Math.random() * (max - min) + min).toFixed(decimals);
+
+    return parseFloat(str);
 }
 
 export type WayfindingRendere = ReturnType<typeof WayfindingRenderer>;
