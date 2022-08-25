@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-    <title>Hololink Tracker</title>
+    <title>Hololink</title>
 
     <style>
       
@@ -20,10 +20,18 @@
         <video id="webcam" muted playsinline></video>
         <!-- <div id="overlay"></div> -->
         <canvas id="renderCanvasWayfinding"></canvas>
-        <div id="hud">
-            <span>Distance</span>
-        </div>
     </div>
+
+    <!-- <div id='modal' class='modal error-container hidden'>
+        <div id='modal-content' class='flex-col center'>
+            <img
+                src='https://assets.hololink.io/viewer/images/error-icon.svg'
+                alt='Error icon'
+                style='width:50px'
+            />
+            <p id='modal-text'></p>
+        </div>
+    </div> -->
 
 
     <div id="tracker-content">
@@ -45,8 +53,8 @@
     </div>
 
     <div id="splash">
-
-        <div id="interact">TAP THE SCREEN TO START</div>
+        <!-- <div class="interact" id="use-safari">Oplevelsen virker desvære kun i Safari browseren.</div> -->
+        <div class="interact" id="tap-start" >TAP THE SCREEN TO START</div>
 
     </div>
 

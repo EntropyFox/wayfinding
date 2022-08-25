@@ -43,7 +43,12 @@ body {
     z-index: 100;
     background-color: hsl(40deg, 90%, 60%);
 }
-#interact {
+
+#use-safari {
+    display: none;   
+}
+
+.interact {
     width: 50%;
     padding: 2rem;
     border-radius: 1rem;

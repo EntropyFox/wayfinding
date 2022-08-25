@@ -3,6 +3,7 @@ import { TrackingManager } from './tracker/tracking.manager';
 import { ARSceneRendere } from './webgl/ar-scene.rendere';
 import { DebugPanel } from './debug-panel';
 import { WayFinding } from './wayfinding/wayfinding';
+import { openModal } from './services/modal.service';
 
 document.addEventListener('DOMContentLoaded', theDomHasLoaded, false);
 document.addEventListener('DOMContentLoaded', theDomHasLoaded, false);
@@ -13,6 +14,31 @@ const system = process.env.SYSTEM || 'tracking';
 console.log('SYSTEM: ', system);
 
 async function theDomHasLoaded(e) {
+    let isBrowserCompatiple = true;
+
+    /// Detect ios and browser
+    if (
+        /iPad|iPhone|iPod/.test(navigator.userAgent) &&
+        navigator.userAgent.indexOf('Chrome') != -1
+    ) {
+        isBrowserCompatiple = false;
+
+        console.log('Ios and chrome');
+        const div = document.createElement('div') as HTMLDivElement;
+        div.innerHTML = 'Oplevelsen virker desvære kun i Safari';
+        div.classList.add('interact');
+
+        const splashDiv = document.getElementById('splash');
+        splashDiv.appendChild(div);
+
+        const tapStart = document.getElementById('tap-start');
+        tapStart.style.display = 'none';
+    }
+
+    if (!isBrowserCompatiple) {
+        return;
+    }
+
     document.querySelector('#splash').addEventListener('click', () => {
         document.getElementById('splash').remove();
         if (system === 'tracking') {
